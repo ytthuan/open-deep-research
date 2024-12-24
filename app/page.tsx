@@ -187,7 +187,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           selectedResults: contentResults,
-          prompt: reportPrompt,
+          prompt: `Generate a detailed report that ${reportPrompt}. Focus on extracting relevant information from the provided sources and organizing it in a clear, structured way.`,
         }),
       })
 
@@ -351,7 +351,7 @@ export default function Home() {
                     type='text'
                     value={reportPrompt}
                     onChange={(e) => setReportPrompt(e.target.value)}
-                    placeholder="Enter report prompt (e.g., 'Compare pros and cons')"
+                    placeholder="What would you like to know? (e.g., 'Compare different approaches', 'Summarize key findings', 'Analyze trends')"
                     className='pr-8'
                     disabled={selectedResults.length === 0}
                   />

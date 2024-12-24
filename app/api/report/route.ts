@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { geminiModel } from '@/lib/gemini'
 import { reportContentRatelimit } from '@/lib/redis'
+import { type Article } from '@/types'
 
 export async function POST(request: Request) {
   try {
@@ -12,26 +13,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
-    const systemPrompt = `Create a detailed report based on ${prompt}.
+    const generateSystemPrompt = (articles: Article[], userPrompt: string) => {
+      return `You are a research assistant tasked with creating a comprehensive report based on the following sources. 
+The report should specifically address this request: "${userPrompt}"
 
-Leverage the following sources:
-${selectedResults
-  .map(
-    (result: any, index: number) => `
-Source ${index + 1}: ${result.title}
-URL: ${result.url}
-Content: ${result.content}
-`
-  )
-  .join('\n')}
+Your report should:
+1. Have a clear title that reflects the specific analysis requested
+2. Begin with a concise executive summary
+3. Be organized into relevant sections based on the analysis requested
+4. Cite information from the provided sources where appropriate
+5. Maintain objectivity while addressing the specific aspects requested in the prompt
 
-Generate a comprehensive report with:
-1. A clear title
-2. An executive summary
-3. Multiple sections analyzing the content
-4. Citations where appropriate
+Here are the source articles to analyze:
 
-Important: Your response must be a valid JSON object with this exact structure:
+${articles.map((article, index) => `
+Source ${index + 1}: ${article.title}
+URL: ${article.url}
+Content: ${article.content}
+`).join('\n')}
+
+Format the report as a JSON object with the following structure:
 {
   "title": "Report title",
   "summary": "Executive summary",
@@ -41,7 +42,12 @@ Important: Your response must be a valid JSON object with this exact structure:
       "content": "Section content"
     }
   ]
-}`
+}
+
+Ensure the report is comprehensive and flexible enough to accommodate various types of analysis as requested in the prompt.`
+    }
+
+    const systemPrompt = generateSystemPrompt(selectedResults, prompt)
 
     console.log('Sending prompt to Gemini:', systemPrompt)
 
