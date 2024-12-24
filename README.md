@@ -27,6 +27,37 @@ Open Deep Research combines powerful tools to streamline research and report cre
 
 Try it out at: [Open Deep Research](https://opendeepresearch.vercel.app/)
 
+## Configuration
+
+The app's settings can be customized through the configuration file at `lib/config.ts`. Here are the key parameters you can adjust:
+
+### Rate Limits
+
+Control the number of requests allowed per minute for different operations:
+
+```typescript
+rateLimits: {
+  search: 5,            // Search requests per minute
+  contentFetch: 20,     // Content fetch requests per minute
+  reportGeneration: 5,  // Report generation requests per minute
+}
+```
+
+### Search Settings
+
+Customize the search behavior:
+
+```typescript
+search: {
+  resultsPerPage: 10,           // Number of search results to fetch
+  maxSelectableResults: 3,      // Maximum results users can select for reports
+  safeSearch: 'Moderate',       // SafeSearch setting ('Off', 'Moderate', 'Strict')
+  market: 'en-US',             // Search market/region
+}
+```
+
+To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
+
 ## Getting Started
 
 ### Prerequisites
@@ -103,37 +134,6 @@ bun dev
 2. Create a new Redis database
 3. Copy the REST URL and REST Token
 
-## Configuration
-
-The app's settings can be customized through the configuration file at `lib/config.ts`. Here are the key parameters you can adjust:
-
-### Rate Limits
-
-Control the number of requests allowed per minute for different operations:
-
-```typescript
-rateLimits: {
-  search: 5,            // Search requests per minute
-  contentFetch: 20,     // Content fetch requests per minute
-  reportGeneration: 5,  // Report generation requests per minute
-}
-```
-
-### Search Settings
-
-Customize the search behavior:
-
-```typescript
-search: {
-  resultsPerPage: 10,           // Number of search results to fetch
-  maxSelectableResults: 3,      // Maximum results users can select for reports
-  safeSearch: 'Moderate',       // SafeSearch setting ('Off', 'Moderate', 'Strict')
-  market: 'en-US',             // Search market/region
-}
-```
-
-To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
-
 ## Tech Stack
 
 - [Next.js 15](https://nextjs.org/) - React framework
@@ -145,12 +145,6 @@ To modify these settings, update the values in `lib/config.ts`. The changes will
 - [Azure Bing Search](https://www.microsoft.com/en-us/bing/apis/bing-web-search-api) - Web search
 - [Upstash Redis](https://upstash.com/) - Rate limiting
 - [jsPDF](https://github.com/parallax/jsPDF) & [docx](https://github.com/dolanmiu/docx) - Document generation
-
-## Rate Limits
-
-- Search: 5 requests per minute
-- Content fetching: 10 requests per minute
-- Report generation: 2 requests per minute
 
 ## Contributing
 
