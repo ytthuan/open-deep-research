@@ -21,7 +21,7 @@ Your report should:
 1. Have a clear title that reflects the specific analysis requested
 2. Begin with a concise executive summary
 3. Be organized into relevant sections based on the analysis requested
-4. Cite information from the provided sources where appropriate
+4. Cite information from the provided sources where appropriate but do not add footnotes or citations
 5. Maintain objectivity while addressing the specific aspects requested in the prompt
 
 Here are the source articles to analyze:
