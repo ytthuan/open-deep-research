@@ -58,10 +58,12 @@ export default function Home() {
         },
         body: JSON.stringify({ query, timeFilter }),
       })
-      
+
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please wait a moment before trying again.')
+          throw new Error(
+            'Rate limit exceeded. Please wait a moment before trying again.'
+          )
         }
         throw new Error('Search failed. Please try again.')
       }
@@ -120,27 +122,35 @@ export default function Home() {
             hitRateLimit = true
             // Create a friendly report for rate limit
             setReport({
-              title: "Rate Limit Reached",
-              summary: "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+              title: 'Rate Limit Reached',
+              summary:
+                "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
               sections: [
                 {
-                  title: "What this means",
-                  content: "To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period."
+                  title: 'What this means',
+                  content:
+                    'To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period.',
                 },
                 {
-                  title: "What you can do",
-                  content: "Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime."
+                  title: 'What you can do',
+                  content:
+                    'Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime.',
                 },
                 {
-                  title: "Why we do this",
-                  content: "Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible."
-                }
-              ]
+                  title: 'Why we do this',
+                  content:
+                    'Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible.',
+                },
+              ],
             })
             setActiveTab('report')
-            throw new Error('Rate limit exceeded. Please wait a moment before generating another report.')
+            throw new Error(
+              'Rate limit exceeded. Please wait a moment before generating another report.'
+            )
           } else {
-            console.warn(`Failed to fetch content for ${article.url}, using snippet`)
+            console.warn(
+              `Failed to fetch content for ${article.url}, using snippet`
+            )
             contentResults.push({
               url: article.url,
               title: article.name,
@@ -159,7 +169,9 @@ export default function Home() {
       }
 
       if (contentResults.length === 0) {
-        throw new Error('Failed to fetch content for any of the selected articles')
+        throw new Error(
+          'Failed to fetch content for any of the selected articles'
+        )
       }
 
       // Only proceed with report generation if we haven't hit rate limit
@@ -178,25 +190,31 @@ export default function Home() {
         if (response.status === 429) {
           // Create a friendly report for rate limit
           setReport({
-            title: "Rate Limit Reached",
-            summary: "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+            title: 'Rate Limit Reached',
+            summary:
+              "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
             sections: [
               {
-                title: "What this means",
-                content: "To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period."
+                title: 'What this means',
+                content:
+                  'To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period.',
               },
               {
-                title: "What you can do",
-                content: "Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime."
+                title: 'What you can do',
+                content:
+                  'Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime.',
               },
               {
-                title: "Why we do this",
-                content: "Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible."
-              }
-            ]
+                title: 'Why we do this',
+                content:
+                  'Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible.',
+              },
+            ],
           })
           setActiveTab('report')
-          throw new Error('Rate limit exceeded. Please wait a moment before generating another report.')
+          throw new Error(
+            'Rate limit exceeded. Please wait a moment before generating another report.'
+          )
         }
         throw new Error('Failed to generate report. Please try again.')
       }
@@ -207,7 +225,9 @@ export default function Home() {
       setActiveTab('report')
     } catch (error) {
       console.error('Report generation failed:', error)
-      setError(error instanceof Error ? error.message : 'Report generation failed')
+      setError(
+        error instanceof Error ? error.message : 'Report generation failed'
+      )
     } finally {
       setGeneratingReport(false)
     }
@@ -250,9 +270,14 @@ export default function Home() {
             {error}
           </div>
         )}
-        
+
         <div className='mb-8'>
-          <h1 className='text-3xl font-bold mb-2 text-center text-gray-800'>
+          <h1 className='text-3xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
+            <img
+              src='/apple-icon.png'
+              alt='Open Deep Research'
+              className='w-8 h-8 rounded-full'
+            />
             Open Deep Research
           </h1>
           <p className='text-center text-gray-600 mb-6'>
@@ -392,9 +417,9 @@ export default function Home() {
                       <div className='w-full sm:w-auto'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant='outline' 
-                              size='sm' 
+                            <Button
+                              variant='outline'
+                              size='sm'
                               className='w-full sm:w-auto gap-2'
                             >
                               <Download className='h-4 w-4' />
@@ -402,13 +427,19 @@ export default function Home() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end'>
-                            <DropdownMenuItem onClick={() => handleDownload('pdf')}>
+                            <DropdownMenuItem
+                              onClick={() => handleDownload('pdf')}
+                            >
                               Download as PDF
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownload('docx')}>
+                            <DropdownMenuItem
+                              onClick={() => handleDownload('docx')}
+                            >
                               Download as Word
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownload('txt')}>
+                            <DropdownMenuItem
+                              onClick={() => handleDownload('txt')}
+                            >
                               Download as Text
                             </DropdownMenuItem>
                           </DropdownMenuContent>
