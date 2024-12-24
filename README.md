@@ -1,7 +1,7 @@
 # Open Deep Research
 
 <div align="center">
-  <img src="demo.gif" alt="Open Deep Research Demo" width="600"/>
+  <img src="demo.gif" alt="Open Deep Research Demo" width="800"/>
 </div>
 
 An open-source alternative to Gemini Deep Research, built to generate AI-powered reports from web search results with precision and efficiency.

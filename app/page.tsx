@@ -283,8 +283,15 @@ export default function Home() {
             </span>
           </h1>
           <p className='text-center text-gray-600 mb-6'>
-            Open source alternative to Gemini Deep Research. Generate reports
-            with AI based on search results.
+            <a
+              href='https://github.com/btahir/open-deep-research'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-600 hover:underline'
+            >
+              Open source alternative to Gemini Deep Research. Generate reports
+              with AI based on search results.
+            </a>
           </p>
           <form onSubmit={handleSearch} className='space-y-4'>
             <div className='flex flex-col sm:flex-row gap-2'>
