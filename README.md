@@ -3,12 +3,9 @@
 An open-source alternative to Gemini Deep Research, built to generate AI-powered reports from web search results with precision and efficiency.
 
 This app functions in three key steps:
-
-Search Results Retrieval: Using the Bing Search API, the app fetches comprehensive search results for the specified search term.
-
-Content Extraction: Leveraging JinaAI, it retrieves and processes the contents of each search result, ensuring accurate and relevant information.
-
-Report Generation: With the curated search results and extracted content, the app generates a detailed report tailored to your custom prompts, providing insightful and synthesized output.
+1. **Search Results Retrieval**: Using the Bing Search API, the app fetches comprehensive search results for the specified search term.
+2. **Content Extraction**: Leveraging JinaAI, it retrieves and processes the contents of each search result, ensuring accurate and relevant information.
+3. **Report Generation**: With the curated search results and extracted content, the app generates a detailed report tailored to your custom prompts, providing insightful and synthesized output. 
 
 Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform.
 
