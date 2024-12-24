@@ -10,6 +10,9 @@ import {
   PageNumber,
 } from 'docx'
 import jsPDF from 'jspdf'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt()
 
 export async function generateDocx(report: Report): Promise<Buffer> {
   try {
@@ -129,7 +132,6 @@ export async function generateDocx(report: Report): Promise<Buffer> {
 
 export function generatePdf(report: Report): Buffer {
   try {
-    // Create new PDF document (A4 format)
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -146,12 +148,37 @@ export function generatePdf(report: Report): Buffer {
       y: number,
       fontSize: number,
       isBold: boolean = false,
-      isJustified: boolean = false
+      isJustified: boolean = false,
+      isHTML: boolean = false
     ): number => {
       doc.setFontSize(fontSize)
       doc.setFont('helvetica', isBold ? 'bold' : 'normal')
 
-      const lines = doc.splitTextToSize(text, contentWidth)
+      // If the text contains markdown, convert it to plain text
+      let processedText = text
+      if (isHTML) {
+        // Remove HTML tags but preserve line breaks
+        processedText = text
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/p>/gi, '\n')
+          .replace(/<[^>]*>/g, '')
+          // Handle markdown-style bold
+          .replace(/\*\*(.*?)\*\*/g, (_, p1) => {
+            doc.setFont('helvetica', 'bold')
+            const result = p1
+            doc.setFont('helvetica', isBold ? 'bold' : 'normal')
+            return result
+          })
+          // Handle markdown-style italic
+          .replace(/\*(.*?)\*/g, (_, p1) => {
+            doc.setFont('helvetica', 'italic')
+            const result = p1
+            doc.setFont('helvetica', isBold ? 'bold' : 'normal')
+            return result
+          })
+      }
+
+      const lines = doc.splitTextToSize(processedText, contentWidth)
       const lineHeight = fontSize * 0.3527 // Convert pt to mm
 
       lines.forEach((line: string) => {
@@ -160,10 +187,19 @@ export function generatePdf(report: Report): Buffer {
           y = margin
         }
 
-        doc.text(line, margin, y, {
-          align: isJustified ? 'justify' : 'left',
-          maxWidth: contentWidth,
-        })
+        // Handle bullet points
+        if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+          doc.text('•', margin, y)
+          doc.text(line.trim().substring(1), margin + 5, y, {
+            align: isJustified ? 'justify' : 'left',
+            maxWidth: contentWidth - 5,
+          })
+        } else {
+          doc.text(line, margin, y, {
+            align: isJustified ? 'justify' : 'left',
+            maxWidth: contentWidth,
+          })
+        }
         y += lineHeight + 1 // 1mm extra spacing between lines
       })
 
@@ -175,28 +211,29 @@ export function generatePdf(report: Report): Buffer {
 
     // Title
     currentY = addText(report.title, currentY, 24, true)
-    currentY += 10 // Extra spacing after title
+    currentY += 5 // Reduced from 10 to 5
 
-    // Summary
-    currentY = addText(report.summary, currentY, 12, false, true)
-    currentY += 10 // Extra spacing after summary
+    // Convert markdown to HTML for processing
+    const summaryHtml = md.render(report.summary)
+    currentY = addText(summaryHtml, currentY, 12, false, true, true)
+    currentY += 3 // Reduced from 10 to 3
 
     // Sections
     report.sections.forEach((section) => {
-      // Add some spacing before section
-      currentY += 5
+      currentY += 2 // Reduced from 5 to 2
 
       // Section title
       currentY = addText(section.title, currentY, 16, true)
-      currentY += 5
+      currentY += 2 // Reduced from 5 to 2
 
-      // Section content
-      currentY = addText(section.content, currentY, 12, false, true)
-      currentY += 5
+      // Convert markdown to HTML for processing
+      const contentHtml = md.render(section.content)
+      currentY = addText(contentHtml, currentY, 12, false, true, true)
+      currentY += 2 // Reduced from 5 to 2
     })
 
     // Add page numbers
-    const pageCount = doc.internal.pages.length - 1 // -1 because pages array is 1-based
+    const pageCount = doc.internal.pages.length - 1
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i)
       doc.setFontSize(10)
@@ -206,7 +243,6 @@ export function generatePdf(report: Report): Buffer {
       })
     }
 
-    // Convert the PDF to a Buffer
     return Buffer.from(doc.output('arraybuffer'))
   } catch (error) {
     console.error('Error generating PDF:', error)
