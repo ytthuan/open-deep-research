@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { reportRatelimit } from '@/lib/redis'
 
 export async function POST(request: Request) {
   try {
@@ -6,17 +7,21 @@ export async function POST(request: Request) {
     const { url } = body
 
     if (!url) {
-      return NextResponse.json(
-        { error: 'URL is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 })
+    }
+
+    const { success } = await reportRatelimit.limit(url)
+    if (!success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
     console.log('Fetching content for URL:', url)
 
     try {
-      const response = await fetch(`https://r.jina.ai/${encodeURIComponent(url)}`)
-      
+      const response = await fetch(
+        `https://r.jina.ai/${encodeURIComponent(url)}`
+      )
+
       if (!response.ok) {
         console.warn(`Failed to fetch content for ${url}:`, response.status)
         return NextResponse.json(
@@ -36,9 +41,6 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error('Content fetching error:', error)
-    return NextResponse.json(
-      { error: 'Invalid request' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
-} 
+}

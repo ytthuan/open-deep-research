@@ -40,12 +40,14 @@ export default function Home() {
   const [generatingReport, setGeneratingReport] = useState(false)
   const [activeTab, setActiveTab] = useState('search')
   const [report, setReport] = useState<Report | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!query.trim()) return
 
     setLoading(true)
+    setError(null)
     setSelectedResults([])
     setReportPrompt('')
     try {
@@ -56,10 +58,19 @@ export default function Home() {
         },
         body: JSON.stringify({ query, timeFilter }),
       })
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please wait a moment before trying again.')
+        }
+        throw new Error('Search failed. Please try again.')
+      }
+
       const data = await response.json()
       setResults(data.webPages?.value || [])
     } catch (error) {
       console.error('Search failed:', error)
+      setError(error instanceof Error ? error.message : 'Search failed')
     } finally {
       setLoading(false)
     }
@@ -78,6 +89,7 @@ export default function Home() {
     if (!reportPrompt || selectedResults.length === 0) return
 
     setGeneratingReport(true)
+    setError(null)
     try {
       const selectedArticles = results.filter((r) =>
         selectedResults.includes(r.id)
@@ -85,6 +97,8 @@ export default function Home() {
 
       // Fetch content for each URL
       const contentResults = []
+      let hitRateLimit = false
+
       for (const article of selectedArticles) {
         try {
           const response = await fetch('/api/fetch-content', {
@@ -97,17 +111,36 @@ export default function Home() {
 
           if (response.ok) {
             const { content } = await response.json()
-            console.log('Fetched content:', content)
-
             contentResults.push({
               url: article.url,
               title: article.name,
               content: content,
             })
+          } else if (response.status === 429) {
+            hitRateLimit = true
+            // Create a friendly report for rate limit
+            setReport({
+              title: "Rate Limit Reached",
+              summary: "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+              sections: [
+                {
+                  title: "What this means",
+                  content: "To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period."
+                },
+                {
+                  title: "What you can do",
+                  content: "Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime."
+                },
+                {
+                  title: "Why we do this",
+                  content: "Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible."
+                }
+              ]
+            })
+            setActiveTab('report')
+            throw new Error('Rate limit exceeded. Please wait a moment before generating another report.')
           } else {
-            console.warn(
-              `Failed to fetch content for ${article.url}, using snippet`
-            )
+            console.warn(`Failed to fetch content for ${article.url}, using snippet`)
             contentResults.push({
               url: article.url,
               title: article.name,
@@ -115,6 +148,7 @@ export default function Home() {
             })
           }
         } catch (error) {
+          if (hitRateLimit) throw error
           console.warn(`Error fetching ${article.url}, using snippet:`, error)
           contentResults.push({
             url: article.url,
@@ -124,7 +158,11 @@ export default function Home() {
         }
       }
 
-      // Generate report with fetched content
+      if (contentResults.length === 0) {
+        throw new Error('Failed to fetch content for any of the selected articles')
+      }
+
+      // Only proceed with report generation if we haven't hit rate limit
       const response = await fetch('/api/report', {
         method: 'POST',
         headers: {
@@ -136,12 +174,40 @@ export default function Home() {
         }),
       })
 
+      if (!response.ok) {
+        if (response.status === 429) {
+          // Create a friendly report for rate limit
+          setReport({
+            title: "Rate Limit Reached",
+            summary: "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+            sections: [
+              {
+                title: "What this means",
+                content: "To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period."
+              },
+              {
+                title: "What you can do",
+                content: "Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime."
+              },
+              {
+                title: "Why we do this",
+                content: "Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible."
+              }
+            ]
+          })
+          setActiveTab('report')
+          throw new Error('Rate limit exceeded. Please wait a moment before generating another report.')
+        }
+        throw new Error('Failed to generate report. Please try again.')
+      }
+
       const data = await response.json()
       console.log('Report data:', data)
       setReport(data)
       setActiveTab('report')
     } catch (error) {
       console.error('Report generation failed:', error)
+      setError(error instanceof Error ? error.message : 'Report generation failed')
     } finally {
       setGeneratingReport(false)
     }
@@ -179,13 +245,19 @@ export default function Home() {
   return (
     <div className='min-h-screen bg-white p-4 sm:p-8'>
       <main className='max-w-4xl mx-auto'>
+        {error && (
+          <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
+            {error}
+          </div>
+        )}
+        
         <div className='mb-8'>
           <h1 className='text-3xl font-bold mb-2 text-center text-gray-800'>
             Open Deep Research
           </h1>
           <p className='text-center text-gray-600 mb-6'>
             Open source alternative to Gemini Deep Research. Generate reports
-            with AI based on web search results.
+            with AI based on search results.
           </p>
           <form onSubmit={handleSearch} className='space-y-4'>
             <div className='flex flex-col sm:flex-row gap-2'>
