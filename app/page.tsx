@@ -97,6 +97,7 @@ export default function Home() {
 
           if (response.ok) {
             const { content } = await response.json()
+            console.log('Fetched content:', content)
 
             contentResults.push({
               url: article.url,
@@ -183,39 +184,40 @@ export default function Home() {
             Web Search
           </h1>
           <form onSubmit={handleSearch} className='space-y-4'>
-            <div className='flex flex-col sm:flex-row gap-4'>
-              <div className='flex-1 flex flex-col sm:flex-row gap-2'>
-                <div className='relative flex-1'>
-                  <Input
-                    type='text'
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder='Enter your search query...'
-                    className='pr-8'
-                  />
-                  <Search className='absolute right-2 top-2 h-5 w-5 text-gray-400' />
-                </div>
+            <div className='flex flex-col sm:flex-row gap-2'>
+              <div className='relative flex-1'>
+                <Input
+                  type='text'
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder='Enter your search query...'
+                  className='pr-8'
+                />
+                <Search className='absolute right-2 top-2 h-5 w-5 text-gray-400' />
+              </div>
+              
+              <div className='flex gap-2'>
+                <Select value={timeFilter} onValueChange={setTimeFilter}>
+                  <SelectTrigger className='w-full sm:w-[140px] sm:shrink-0'>
+                    <SelectValue placeholder='Select time range' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeFilters.map((filter) => (
+                      <SelectItem key={filter.value} value={filter.value}>
+                        {filter.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
                 <Button
                   type='submit'
                   disabled={loading}
-                  className='w-full sm:w-auto'
+                  className='shrink-0 flex-1 sm:flex-initial'
                 >
                   {loading ? 'Searching...' : 'Search'}
                 </Button>
               </div>
-
-              <Select value={timeFilter} onValueChange={setTimeFilter}>
-                <SelectTrigger className='w-full sm:w-[180px]'>
-                  <SelectValue placeholder='Select time range' />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeFilters.map((filter) => (
-                    <SelectItem key={filter.value} value={filter.value}>
-                      {filter.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </form>
         </div>
