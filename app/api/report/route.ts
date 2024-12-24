@@ -6,11 +6,9 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { selectedResults, prompt } = body
 
-    const systemPrompt = `You are a professional report writer. Create a detailed report based on the following content from multiple sources. 
-    
-User's specific request: "${prompt}"
+    const systemPrompt = `Create a detailed report based on ${prompt}.
 
-Sources:
+Leverage the following sources:
 ${selectedResults
   .map(
     (result: any, index: number) => `
@@ -44,7 +42,7 @@ Important: Your response must be a valid JSON object with this exact structure:
     try {
       const result = await geminiModel.generateContent(systemPrompt)
       const response = result.response.text()
-      console.log('Raw Gemini response:', response)
+      // console.log('Raw Gemini response:', response)
 
       // Extract JSON using regex
       const jsonMatch = response.match(/\{[\s\S]*\}/)?.[0]
