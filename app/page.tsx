@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { type Report } from '@/types'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const timeFilters = [
   { value: 'all', label: 'Any time' },
@@ -118,6 +120,7 @@ export default function Home() {
 
           if (response.ok) {
             const { content } = await response.json()
+            console.log('Content:', content)
             contentResults.push({
               url: article.url,
               title: article.name,
@@ -469,7 +472,11 @@ export default function Home() {
                         <h3 className='text-xl font-semibold text-gray-700'>
                           {section.title}
                         </h3>
-                        <p className='text-gray-600'>{section.content}</p>
+                        <div className='prose max-w-none text-gray-600'>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {section.content}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     ))}
                   </CardContent>

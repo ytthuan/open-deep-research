@@ -21,8 +21,9 @@ Your report should:
 1. Have a clear title that reflects the specific analysis requested
 2. Begin with a concise executive summary
 3. Be organized into relevant sections based on the analysis requested
-4. Cite information from the provided sources where appropriate but do not add footnotes or citations
-5. Maintain objectivity while addressing the specific aspects requested in the prompt
+4. Use markdown formatting for emphasis, lists, and structure
+5. Cite information from the provided sources where appropriate but do not add footnotes or citations
+6. Maintain objectivity while addressing the specific aspects requested in the prompt
 
 Here are the source articles to analyze:
 
@@ -35,14 +36,22 @@ Content: ${article.content}
 Format the report as a JSON object with the following structure:
 {
   "title": "Report title",
-  "summary": "Executive summary",
+  "summary": "Executive summary (can include markdown)",
   "sections": [
     {
       "title": "Section title",
-      "content": "Section content"
+      "content": "Section content with markdown formatting"
     }
   ]
 }
+
+Use markdown formatting in the content to improve readability:
+- Use **bold** for emphasis
+- Use bullet points and numbered lists where appropriate
+- Use headings and subheadings with # syntax
+- Include code blocks if relevant
+- Use > for quotations
+- Use --- for horizontal rules where appropriate
 
 Ensure the report is comprehensive and flexible enough to accommodate various types of analysis as requested in the prompt.`
     }
