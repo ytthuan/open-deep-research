@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { reportRatelimit } from '@/lib/redis'
+import { fetchContentRatelimit } from '@/lib/redis'
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
-    const { success } = await reportRatelimit.limit(url)
+    const { success } = await fetchContentRatelimit.limit(url)
     if (!success) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }

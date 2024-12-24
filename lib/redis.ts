@@ -6,12 +6,20 @@ export const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
 })
 
+// Search: 5 requests per minute
 export const searchRatelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(2, '1 m'),
+  limiter: Ratelimit.slidingWindow(5, '1 m'),
 })
 
-export const reportRatelimit = new Ratelimit({
+// Content fetching: 10 requests per minute
+export const fetchContentRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '1 m'),
+})
+
+// Report generation: 2 requests per minute
+export const reportContentRatelimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(2, '1 m'),
 })

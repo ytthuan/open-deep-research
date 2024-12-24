@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
 import { geminiModel } from '@/lib/gemini'
+import { reportContentRatelimit } from '@/lib/redis'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { selectedResults, prompt } = body
+
+    const { success } = await reportContentRatelimit.limit('report')
+    if (!success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
 
     const systemPrompt = `Create a detailed report based on ${prompt}.
 

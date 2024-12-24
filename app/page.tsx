@@ -61,9 +61,7 @@ export default function Home() {
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error(
-            'Rate limit exceeded. Please wait a moment before trying again.'
-          )
+          throw new Error('Search rate limit exceeded. Please wait a moment before trying again.')
         }
         throw new Error('Search failed. Please try again.')
       }
