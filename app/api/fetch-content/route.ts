@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { fetchContentRatelimit } from '@/lib/redis'
+import { CONFIG } from '@/lib/config'
 
 export async function POST(request: Request) {
   try {
@@ -10,9 +11,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
-    const { success } = await fetchContentRatelimit.limit(url)
-    if (!success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    // Only check rate limit if enabled
+    if (CONFIG.rateLimits.enabled) {
+      const { success } = await fetchContentRatelimit.limit(url)
+      if (!success) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          { status: 429 }
+        )
+      }
     }
 
     console.log('Fetching content for URL:', url)

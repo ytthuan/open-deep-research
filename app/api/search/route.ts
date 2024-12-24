@@ -32,9 +32,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { success } = await searchRatelimit.limit(query)
-    if (!success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    // Only check rate limit if enabled
+    if (CONFIG.rateLimits.enabled) {
+      const { success } = await searchRatelimit.limit(query)
+      if (!success) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          { status: 429 }
+        )
+      }
     }
 
     const subscriptionKey = process.env.AZURE_SUB_KEY

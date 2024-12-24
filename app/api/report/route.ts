@@ -2,15 +2,22 @@ import { NextResponse } from 'next/server'
 import { geminiModel } from '@/lib/gemini'
 import { reportContentRatelimit } from '@/lib/redis'
 import { type Article } from '@/types'
+import { CONFIG } from '@/lib/config'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { selectedResults, prompt } = body
 
-    const { success } = await reportContentRatelimit.limit('report')
-    if (!success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    // Only check rate limit if enabled
+    if (CONFIG.rateLimits.enabled) {
+      const { success } = await reportContentRatelimit.limit('report')
+      if (!success) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          { status: 429 }
+        )
+      }
     }
 
     const generateSystemPrompt = (articles: Article[], userPrompt: string) => {
@@ -27,11 +34,15 @@ Your report should:
 
 Here are the source articles to analyze:
 
-${articles.map((article, index) => `
+${articles
+  .map(
+    (article, index) => `
 Source ${index + 1}: ${article.title}
 URL: ${article.url}
 Content: ${article.content}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 Format the report as a JSON object with the following structure:
 {
