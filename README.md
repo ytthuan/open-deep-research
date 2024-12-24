@@ -33,15 +33,18 @@ The app's settings can be customized through the configuration file at `lib/conf
 
 ### Rate Limits
 
-Control the number of requests allowed per minute for different operations:
+Control rate limiting and the number of requests allowed per minute for different operations:
 
 ```typescript
 rateLimits: {
+  enabled: true,         // Enable/disable rate limiting (set to false to skip Redis setup)
   search: 5,            // Search requests per minute
   contentFetch: 20,     // Content fetch requests per minute
   reportGeneration: 5,  // Report generation requests per minute
 }
 ```
+
+Note: If you set `enabled: false`, you can run the application without setting up Redis. This is useful for local development or when you don't need rate limiting.
 
 ### Search Settings
 
