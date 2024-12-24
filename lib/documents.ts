@@ -13,7 +13,10 @@ import jsPDF from 'jspdf'
 
 export async function generateDocx(report: Report): Promise<Buffer> {
   try {
-    console.log('Starting DOCX generation with report:', JSON.stringify(report, null, 2))
+    console.log(
+      'Starting DOCX generation with report:',
+      JSON.stringify(report, null, 2)
+    )
 
     const doc = new Document({
       sections: [
@@ -26,11 +29,12 @@ export async function generateDocx(report: Report): Promise<Buffer> {
                   children: [
                     new TextRun({
                       text: report.title || 'Untitled Report',
-                      size: 48, // 24pt
+                      size: 48,
                       bold: true,
                     }),
                   ],
                   alignment: AlignmentType.CENTER,
+                  spacing: { after: 800 },
                 }),
               ],
             }),
@@ -40,11 +44,11 @@ export async function generateDocx(report: Report): Promise<Buffer> {
               children: [
                 new Paragraph({
                   children: [
-                    new TextRun("Page "),
+                    new TextRun('Page '),
                     new TextRun({
                       children: [PageNumber.CURRENT],
                     }),
-                    new TextRun(" of "),
+                    new TextRun(' of '),
                     new TextRun({
                       children: [PageNumber.TOTAL_PAGES],
                     }),
@@ -55,7 +59,7 @@ export async function generateDocx(report: Report): Promise<Buffer> {
             }),
           },
           children: [
-            // Summary
+            // Summary with increased spacing
             new Paragraph({
               children: [
                 new TextRun({
@@ -63,10 +67,10 @@ export async function generateDocx(report: Report): Promise<Buffer> {
                   size: 24,
                 }),
               ],
-              spacing: { before: 400, after: 400 },
+              spacing: { before: 800, after: 800 },
               alignment: AlignmentType.JUSTIFIED,
             }),
-            // Sections
+            // Sections with increased spacing
             ...report.sections.flatMap((section) => [
               new Paragraph({
                 children: [
@@ -76,7 +80,7 @@ export async function generateDocx(report: Report): Promise<Buffer> {
                     bold: true,
                   }),
                 ],
-                spacing: { before: 400, after: 200 },
+                spacing: { before: 800, after: 400 },
                 alignment: AlignmentType.LEFT,
               }),
               new Paragraph({
@@ -86,7 +90,7 @@ export async function generateDocx(report: Report): Promise<Buffer> {
                     size: 24,
                   }),
                 ],
-                spacing: { before: 200, after: 300 },
+                spacing: { before: 400, after: 800 },
                 alignment: AlignmentType.JUSTIFIED,
               }),
             ]),
@@ -112,10 +116,14 @@ export async function generateDocx(report: Report): Promise<Buffer> {
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
       })
     }
-    throw new Error(`Failed to generate DOCX: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    throw new Error(
+      `Failed to generate DOCX: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    )
   }
 }
 
@@ -125,7 +133,7 @@ export function generatePdf(report: Report): Buffer {
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
     })
 
     const pageWidth = doc.internal.pageSize.width
@@ -145,16 +153,16 @@ export function generatePdf(report: Report): Buffer {
 
       const lines = doc.splitTextToSize(text, contentWidth)
       const lineHeight = fontSize * 0.3527 // Convert pt to mm
-      
+
       lines.forEach((line: string) => {
         if (y > 270) {
           doc.addPage()
           y = margin
         }
-        
+
         doc.text(line, margin, y, {
           align: isJustified ? 'justify' : 'left',
-          maxWidth: contentWidth
+          maxWidth: contentWidth,
         })
         y += lineHeight + 1 // 1mm extra spacing between lines
       })
@@ -188,17 +196,14 @@ export function generatePdf(report: Report): Buffer {
     })
 
     // Add page numbers
-    const pageCount = doc.internal.pages.length - 1  // -1 because pages array is 1-based
+    const pageCount = doc.internal.pages.length - 1 // -1 because pages array is 1-based
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i)
       doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth / 2,
-        285,
-        { align: 'center' }
-      )
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 285, {
+        align: 'center',
+      })
     }
 
     // Convert the PDF to a Buffer
@@ -207,4 +212,4 @@ export function generatePdf(report: Report): Buffer {
     console.error('Error generating PDF:', error)
     throw new Error('Failed to generate PDF')
   }
-} 
+}
