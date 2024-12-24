@@ -289,9 +289,10 @@ export default function Home() {
               rel='noopener noreferrer'
               className='text-blue-600 hover:underline'
             >
-              Open source alternative to Gemini Deep Research. Generate reports
-              with AI based on search results.
+              Open source alternative
             </a>
+            to Gemini Deep Research. Generate reports with AI based on search
+            results.
           </p>
           <form onSubmit={handleSearch} className='space-y-4'>
             <div className='flex flex-col sm:flex-row gap-2'>
