@@ -46,6 +46,10 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('search')
   const [report, setReport] = useState<Report | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [fetchStatus, setFetchStatus] = useState<{
+    total: number
+    successful: number
+  }>({ total: 0, successful: 0 })
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -100,6 +104,8 @@ export default function Home() {
 
     setGeneratingReport(true)
     setError(null)
+    setFetchStatus({ total: selectedResults.length, successful: 0 })
+
     try {
       const selectedArticles = results.filter((r) =>
         selectedResults.includes(r.id)
@@ -121,12 +127,15 @@ export default function Home() {
 
           if (response.ok) {
             const { content } = await response.json()
-            console.log('Content:', content)
             contentResults.push({
               url: article.url,
               title: article.name,
               content: content,
             })
+            setFetchStatus((prev) => ({
+              ...prev,
+              successful: prev.successful + 1,
+            }))
           } else if (response.status === 429) {
             hitRateLimit = true
             // Create a friendly report for rate limit
@@ -177,20 +186,25 @@ export default function Home() {
         }
       }
 
-      if (contentResults.length === 0) {
+      // Only proceed with successful fetches
+      const successfulResults = contentResults.filter(
+        (result) => result.content && result.content.trim().length > 0
+      )
+
+      if (successfulResults.length === 0) {
         throw new Error(
-          'Failed to fetch content for any of the selected articles'
+          'Failed to fetch usable content for any of the selected articles'
         )
       }
 
-      // Only proceed with report generation if we haven't hit rate limit
+      // Update the report generation API call to use filtered results
       const response = await fetch('/api/report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          selectedResults: contentResults,
+          selectedResults: successfulResults,
           prompt: `Generate a detailed report that ${reportPrompt}. Focus on extracting relevant information from the provided sources and organizing it in a clear, structured way.`,
         }),
       })
@@ -374,11 +388,19 @@ export default function Home() {
                   {generatingReport ? 'Generating...' : 'Generate Report'}
                 </Button>
               </div>
-              <p className='text-sm text-gray-600 text-center sm:text-left'>
-                {selectedResults.length === 0
-                  ? 'Select up to 3 results to generate a report'
-                  : `${selectedResults.length} of ${MAX_SELECTIONS} results selected`}
-              </p>
+              <div className='text-sm text-gray-600 text-center sm:text-left space-y-1'>
+                <p>
+                  {selectedResults.length === 0
+                    ? 'Select up to 3 results to generate a report'
+                    : `${selectedResults.length} of ${MAX_SELECTIONS} results selected`}
+                </p>
+                {generatingReport && (
+                  <p>
+                    Fetching content: {fetchStatus.successful} of{' '}
+                    {fetchStatus.total} successful
+                  </p>
+                )}
+              </div>
             </div>
 
             <TabsList className='grid w-full grid-cols-2 mb-4'>
