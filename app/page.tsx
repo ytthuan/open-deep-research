@@ -180,9 +180,13 @@ export default function Home() {
     <div className='min-h-screen bg-white p-4 sm:p-8'>
       <main className='max-w-4xl mx-auto'>
         <div className='mb-8'>
-          <h1 className='text-3xl font-bold mb-6 text-center text-gray-800'>
-            Web Search
+          <h1 className='text-3xl font-bold mb-2 text-center text-gray-800'>
+            Open Deep Research
           </h1>
+          <p className='text-center text-gray-600 mb-6'>
+            Open source alternative to Gemini Deep Research. Generate reports
+            with AI based on web search results.
+          </p>
           <form onSubmit={handleSearch} className='space-y-4'>
             <div className='flex flex-col sm:flex-row gap-2'>
               <div className='relative flex-1'>
@@ -195,7 +199,7 @@ export default function Home() {
                 />
                 <Search className='absolute right-2 top-2 h-5 w-5 text-gray-400' />
               </div>
-              
+
               <div className='flex gap-2'>
                 <Select value={timeFilter} onValueChange={setTimeFilter}>
                   <SelectTrigger className='w-full sm:w-[140px] sm:shrink-0'>
@@ -309,35 +313,35 @@ export default function Home() {
               {report && (
                 <Card>
                   <CardContent className='p-6 space-y-6'>
-                    <div className='flex justify-between items-start'>
-                      <h2 className='text-2xl font-bold text-gray-800'>
+                    <div className='flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-4'>
+                      <h2 className='text-2xl font-bold text-gray-800 text-center sm:text-left'>
                         {report.title}
                       </h2>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='outline' size='sm' className='gap-2'>
-                            <Download className='h-4 w-4' />
-                            Download
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuItem
-                            onClick={() => handleDownload('pdf')}
-                          >
-                            Download as PDF
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDownload('docx')}
-                          >
-                            Download as Word
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDownload('txt')}
-                          >
-                            Download as Text
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className='w-full sm:w-auto'>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant='outline' 
+                              size='sm' 
+                              className='w-full sm:w-auto gap-2'
+                            >
+                              <Download className='h-4 w-4' />
+                              Download
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align='end'>
+                            <DropdownMenuItem onClick={() => handleDownload('pdf')}>
+                              Download as PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownload('docx')}>
+                              Download as Word
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownload('txt')}>
+                              Download as Text
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                     <p className='text-lg text-gray-700'>{report.summary}</p>
                     {report.sections.map((section, index) => (
