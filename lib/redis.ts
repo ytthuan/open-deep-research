@@ -18,8 +18,8 @@ export const fetchContentRatelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(20, '1 m'),
 })
 
-// Report generation: 2 requests per minute
+// Report generation: 5 requests per minute
 export const reportContentRatelimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(2, '1 m'),
+  limiter: Ratelimit.slidingWindow(5, '1 m'),
 })
