@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import { type Report } from '@/types'
 
 const timeFilters = [
@@ -79,8 +79,10 @@ export default function Home() {
 
     setGeneratingReport(true)
     try {
-      const selectedArticles = results.filter((r) => selectedResults.includes(r.id))
-      
+      const selectedArticles = results.filter((r) =>
+        selectedResults.includes(r.id)
+      )
+
       // Fetch content for each URL
       const contentResults = []
       for (const article of selectedArticles) {
@@ -92,17 +94,19 @@ export default function Home() {
             },
             body: JSON.stringify({ url: article.url }),
           })
-          
+
           if (response.ok) {
             const { content } = await response.json()
-            console.log('content', content)
+
             contentResults.push({
               url: article.url,
               title: article.name,
               content: content,
             })
           } else {
-            console.warn(`Failed to fetch content for ${article.url}, using snippet`)
+            console.warn(
+              `Failed to fetch content for ${article.url}, using snippet`
+            )
             contentResults.push({
               url: article.url,
               title: article.name,
@@ -130,7 +134,7 @@ export default function Home() {
           prompt: reportPrompt,
         }),
       })
-      
+
       const data = await response.json()
       console.log('Report data:', data)
       setReport(data)
@@ -144,7 +148,7 @@ export default function Home() {
 
   const handleDownload = async (format: 'pdf' | 'docx' | 'txt') => {
     if (!report) return
-    
+
     try {
       const response = await fetch('/api/download', {
         method: 'POST',
@@ -156,7 +160,7 @@ export default function Home() {
           format,
         }),
       })
-      
+
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -303,23 +307,31 @@ export default function Home() {
               {report && (
                 <Card>
                   <CardContent className='p-6 space-y-6'>
-                    <div className="flex justify-between items-start">
-                      <h2 className='text-2xl font-bold text-gray-800'>{report.title}</h2>
+                    <div className='flex justify-between items-start'>
+                      <h2 className='text-2xl font-bold text-gray-800'>
+                        {report.title}
+                      </h2>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="gap-2">
-                            <Download className="h-4 w-4" />
+                          <Button variant='outline' size='sm' className='gap-2'>
+                            <Download className='h-4 w-4' />
                             Download
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleDownload('pdf')}>
+                        <DropdownMenuContent align='end'>
+                          <DropdownMenuItem
+                            onClick={() => handleDownload('pdf')}
+                          >
                             Download as PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownload('docx')}>
+                          <DropdownMenuItem
+                            onClick={() => handleDownload('docx')}
+                          >
                             Download as Word
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownload('txt')}>
+                          <DropdownMenuItem
+                            onClick={() => handleDownload('txt')}
+                          >
                             Download as Text
                           </DropdownMenuItem>
                         </DropdownMenuContent>

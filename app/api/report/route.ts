@@ -6,27 +6,74 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { selectedResults, prompt } = body
 
-    // TODO: Implement actual report generation with Gemini
-    const placeholderReport = {
-      title: "Analysis Report",
-      summary: "This is a placeholder report summary based on the selected articles.",
-      sections: [
-        {
-          title: "Key Points",
-          content: "Here are the main points from the selected articles...",
-        },
-        {
-          title: "Analysis",
-          content: `Analysis based on prompt: "${prompt}"...`,
-        },
-        {
-          title: "Sources",
-          content: `Based on ${selectedResults.length} selected sources`,
-        }
-      ]
-    }
+    const systemPrompt = `You are a professional report writer. Create a detailed report based on the following content from multiple sources. 
+    
+User's specific request: "${prompt}"
 
-    return NextResponse.json(placeholderReport)
+Sources:
+${selectedResults
+  .map(
+    (result: any, index: number) => `
+Source ${index + 1}: ${result.title}
+URL: ${result.url}
+Content: ${result.content}
+`
+  )
+  .join('\n')}
+
+Generate a comprehensive report with:
+1. A clear title
+2. An executive summary
+3. Multiple sections analyzing the content
+4. Citations where appropriate
+
+Important: Your response must be a valid JSON object with this exact structure:
+{
+  "title": "Report title",
+  "summary": "Executive summary",
+  "sections": [
+    {
+      "title": "Section title",
+      "content": "Section content"
+    }
+  ]
+}`
+
+    console.log('Sending prompt to Gemini:', systemPrompt)
+
+    try {
+      const result = await geminiModel.generateContent(systemPrompt)
+      const response = result.response.text()
+      console.log('Raw Gemini response:', response)
+
+      // Extract JSON using regex
+      const jsonMatch = response.match(/\{[\s\S]*\}/)?.[0]
+      if (!jsonMatch) {
+        console.error('No JSON found in response')
+        return NextResponse.json(
+          { error: 'Invalid report format' },
+          { status: 500 }
+        )
+      }
+
+      try {
+        const reportData = JSON.parse(jsonMatch)
+        console.log('Parsed report data:', reportData)
+        return NextResponse.json(reportData)
+      } catch (parseError) {
+        console.error('JSON parsing error:', parseError)
+        return NextResponse.json(
+          { error: 'Failed to parse report format' },
+          { status: 500 }
+        )
+      }
+    } catch (error) {
+      console.error('Gemini generation error:', error)
+      return NextResponse.json(
+        { error: 'Failed to generate report content' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     console.error('Report generation error:', error)
     return NextResponse.json(
@@ -34,4 +81,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}
