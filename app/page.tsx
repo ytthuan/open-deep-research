@@ -23,6 +23,7 @@ import {
 import { type Report } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { CONFIG } from '@/lib/config'
 
 const timeFilters = [
   { value: 'all', label: 'Any time' },
@@ -32,7 +33,7 @@ const timeFilters = [
   { value: 'year', label: 'Past year' },
 ] as const
 
-const MAX_SELECTIONS = 3
+const MAX_SELECTIONS = CONFIG.search.maxSelectableResults
 
 export default function Home() {
   const [query, setQuery] = useState('')

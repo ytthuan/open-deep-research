@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { searchRatelimit } from '@/lib/redis'
+import { CONFIG } from '@/lib/config'
 const BING_ENDPOINT = 'https://api.bing.microsoft.com/v7.0/search'
 
 type TimeFilter = '24h' | 'week' | 'month' | 'year' | 'all'
@@ -46,9 +47,9 @@ export async function POST(request: Request) {
 
     const params = new URLSearchParams({
       q: query,
-      count: '10',
-      mkt: 'en-US',
-      safeSearch: 'Moderate',
+      count: CONFIG.search.resultsPerPage.toString(),
+      mkt: CONFIG.search.market,
+      safeSearch: CONFIG.search.safeSearch,
       textFormat: 'HTML',
       textDecorations: 'true',
     })

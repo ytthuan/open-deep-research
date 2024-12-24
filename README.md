@@ -103,9 +103,40 @@ bun dev
 2. Create a new Redis database
 3. Copy the REST URL and REST Token
 
+## Configuration
+
+The app's settings can be customized through the configuration file at `lib/config.ts`. Here are the key parameters you can adjust:
+
+### Rate Limits
+
+Control the number of requests allowed per minute for different operations:
+
+```typescript
+rateLimits: {
+  search: 5,            // Search requests per minute
+  contentFetch: 20,     // Content fetch requests per minute
+  reportGeneration: 5,  // Report generation requests per minute
+}
+```
+
+### Search Settings
+
+Customize the search behavior:
+
+```typescript
+search: {
+  resultsPerPage: 10,           // Number of search results to fetch
+  maxSelectableResults: 3,      // Maximum results users can select for reports
+  safeSearch: 'Moderate',       // SafeSearch setting ('Off', 'Moderate', 'Strict')
+  market: 'en-US',             // Search market/region
+}
+```
+
+To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
+
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/) - React framework
+- [Next.js 15](https://nextjs.org/) - React framework
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [shadcn/ui](https://ui.shadcn.com/) - UI components
