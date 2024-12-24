@@ -12,7 +12,7 @@ This app functions in three key steps:
 2. **Content Extraction**: Leveraging JinaAI, it retrieves and processes the contents of the selected search results, ensuring accurate and relevant information.
 3. **Report Generation**: With the curated search results and extracted content, the app generates a detailed report tailored to your custom prompts, providing insightful and synthesized output.
 
-Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform.
+Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform. You can customize the app to your needs (change the model, prompt, update rate limits and number of results both fetched and selected etc.)
 
 ## Features
 
