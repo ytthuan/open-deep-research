@@ -30,6 +30,8 @@ const timeFilters = [
   { value: 'year', label: 'Past year' },
 ] as const
 
+const MAX_SELECTIONS = 3
+
 export default function Home() {
   const [query, setQuery] = useState('')
   const [timeFilter, setTimeFilter] = useState('all')
@@ -82,6 +84,9 @@ export default function Home() {
     setSelectedResults((prev) => {
       if (prev.includes(resultId)) {
         return prev.filter((id) => id !== resultId)
+      }
+      if (prev.length >= MAX_SELECTIONS) {
+        return prev
       }
       return [...prev, resultId]
     })
@@ -367,10 +372,8 @@ export default function Home() {
               </div>
               <p className='text-sm text-gray-600 text-center sm:text-left'>
                 {selectedResults.length === 0
-                  ? 'Select results to generate a report'
-                  : `${selectedResults.length} result${
-                      selectedResults.length === 1 ? '' : 's'
-                    } selected`}
+                  ? 'Select up to 3 results to generate a report'
+                  : `${selectedResults.length} of ${MAX_SELECTIONS} results selected`}
               </p>
             </div>
 
@@ -389,6 +392,10 @@ export default function Home() {
                       <Checkbox
                         checked={selectedResults.includes(result.id)}
                         onCheckedChange={() => handleResultSelect(result.id)}
+                        disabled={
+                          !selectedResults.includes(result.id) &&
+                          selectedResults.length >= MAX_SELECTIONS
+                        }
                       />
                     </div>
                     <div className='flex-1 min-w-0'>
