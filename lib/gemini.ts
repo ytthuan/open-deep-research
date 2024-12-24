@@ -5,7 +5,6 @@ import {
 } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-const genAIPaid = new GoogleGenerativeAI(process.env.GEMINI_API_KEY_PAID || '')
 
 const generationConfig = {
   temperature: 1,
