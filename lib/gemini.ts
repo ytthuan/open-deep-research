@@ -44,28 +44,3 @@ export const geminiModel = genAI.getGenerativeModel({
   safetySettings,
   generationConfig: generationConfigJson,
 })
-
-export const geminiGroundedModel = genAIPaid.getGenerativeModel(
-  {
-    model: 'gemini-1.5-flash-002',
-    safetySettings,
-    generationConfig: generationConfigText,
-    tools: [
-      {
-        googleSearchRetrieval: {
-          dynamicRetrievalConfig: {
-            mode: DynamicRetrievalMode.MODE_DYNAMIC,
-            dynamicThreshold: 0.3,
-          },
-        },
-      },
-    ],
-  },
-  { apiVersion: 'v1beta' }
-)
-
-export const gemini8bModel = genAIPaid.getGenerativeModel({
-  model: 'gemini-1.5-flash-8b',
-  safetySettings,
-  generationConfig: generationConfigText,
-})

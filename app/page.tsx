@@ -79,20 +79,60 @@ export default function Home() {
 
     setGeneratingReport(true)
     try {
-      const selectedArticles = results.filter((r) =>
-        selectedResults.includes(r.id)
-      )
+      const selectedArticles = results.filter((r) => selectedResults.includes(r.id))
+      
+      // Fetch content for each URL
+      const contentResults = []
+      for (const article of selectedArticles) {
+        try {
+          const response = await fetch('/api/fetch-content', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: article.url }),
+          })
+          
+          if (response.ok) {
+            const { content } = await response.json()
+            console.log('content', content)
+            contentResults.push({
+              url: article.url,
+              title: article.name,
+              content: content,
+            })
+          } else {
+            console.warn(`Failed to fetch content for ${article.url}, using snippet`)
+            contentResults.push({
+              url: article.url,
+              title: article.name,
+              content: article.snippet,
+            })
+          }
+        } catch (error) {
+          console.warn(`Error fetching ${article.url}, using snippet:`, error)
+          contentResults.push({
+            url: article.url,
+            title: article.name,
+            content: article.snippet,
+          })
+        }
+      }
+
+      // Generate report with fetched content
       const response = await fetch('/api/report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          selectedResults: selectedArticles,
+          selectedResults: contentResults,
           prompt: reportPrompt,
         }),
       })
+      
       const data = await response.json()
+      console.log('Report data:', data)
       setReport(data)
       setActiveTab('report')
     } catch (error) {

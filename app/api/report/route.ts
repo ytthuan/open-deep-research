@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { geminiModel } from '@/lib/gemini'
 
 export async function POST(request: Request) {
   try {
