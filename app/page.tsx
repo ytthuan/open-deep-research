@@ -290,7 +290,7 @@ export default function Home() {
               className='text-blue-600 hover:underline'
             >
               Open source alternative
-            </a>
+            </a>{' '}
             to Gemini Deep Research. Generate reports with AI based on search
             results.
           </p>
