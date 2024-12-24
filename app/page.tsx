@@ -61,7 +61,9 @@ export default function Home() {
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error('Search rate limit exceeded. Please wait a moment before trying again.')
+          throw new Error(
+            'Search rate limit exceeded. Please wait a moment before trying again.'
+          )
         }
         throw new Error('Search failed. Please try again.')
       }
@@ -270,13 +272,15 @@ export default function Home() {
         )}
 
         <div className='mb-8'>
-          <h1 className='text-3xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
+          <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
             <img
               src='/apple-icon.png'
               alt='Open Deep Research'
-              className='w-8 h-8 rounded-full'
+              className='w-6 h-6 sm:w-8 sm:h-8 rounded-full'
             />
-            Open Deep Research
+            <span className='text-xl sm:text-3xl font-bold font-heading'>
+              Open Deep Research
+            </span>
           </h1>
           <p className='text-center text-gray-600 mb-6'>
             Open source alternative to Gemini Deep Research. Generate reports
