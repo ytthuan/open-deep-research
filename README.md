@@ -25,7 +25,7 @@ Open Deep Research combines powerful tools to streamline research and report cre
 
 ## Demo
 
-Try it out at: [demo-url-here](https://your-demo-url.com)
+Try it out at: [Open Deep Research](https://opendeepresearch.vercel.app/)
 
 ## Getting Started
 
