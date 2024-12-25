@@ -234,7 +234,7 @@ export default function Home() {
         )
       }
 
-      // Update the report generation API call to use filtered results
+      // Update the report generation API call
       const response = await fetch('/api/report', {
         method: 'POST',
         headers: {
@@ -242,7 +242,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           selectedResults: successfulResults,
-          prompt: `Generate a detailed report that ${reportPrompt}. Focus on extracting relevant information from the provided sources and organizing it in a clear, structured way.`,
+          prompt: `${reportPrompt}. Provide a comprehensive analysis that synthesizes all relevant information from the provided sources.`,
         }),
       })
 

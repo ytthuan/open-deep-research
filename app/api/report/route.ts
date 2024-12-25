@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     const generateSystemPrompt = (articles: Article[], userPrompt: string) => {
-      return `You are a research assistant tasked with creating a comprehensive report based on the following sources. 
+      return `You are a research assistant tasked with creating a comprehensive report based on multiple sources. 
 The report should specifically address this request: "${userPrompt}"
 
 Your report should:
@@ -29,17 +29,18 @@ Your report should:
 2. Begin with a concise executive summary
 3. Be organized into relevant sections based on the analysis requested
 4. Use markdown formatting for emphasis, lists, and structure
-5. Cite information from the provided sources where appropriate but do not add footnotes or citations
+5. Integrate information from sources naturally without explicitly referencing them by number
 6. Maintain objectivity while addressing the specific aspects requested in the prompt
 
 Here are the source articles to analyze:
 
 ${articles
   .map(
-    (article, index) => `
-Source ${index + 1}: ${article.title}
+    (article) => `
+Title: ${article.title}
 URL: ${article.url}
 Content: ${article.content}
+---
 `
   )
   .join('\n')}
@@ -64,7 +65,7 @@ Use markdown formatting in the content to improve readability:
 - Use > for quotations
 - Use --- for horizontal rules where appropriate
 
-Ensure the report is comprehensive and flexible enough to accommodate various types of analysis as requested in the prompt.`
+Important: Do not use phrases like "Source 1" or "According to Source 2". Instead, integrate the information naturally into the narrative or reference sources by their titles when necessary.`
     }
 
     const systemPrompt = generateSystemPrompt(selectedResults, prompt)
