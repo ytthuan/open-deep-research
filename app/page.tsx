@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, FileText, Download } from 'lucide-react'
+import { Search, FileText, Download, Plus, X } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -25,6 +25,14 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CONFIG } from '@/lib/config'
 
+type SearchResult = {
+  id: string
+  url: string
+  name: string
+  snippet: string
+  isCustomUrl?: boolean
+}
+
 const timeFilters = [
   { value: 'all', label: 'Any time' },
   { value: '24h', label: 'Past 24 hours' },
@@ -38,7 +46,7 @@ const MAX_SELECTIONS = CONFIG.search.maxSelectableResults
 export default function Home() {
   const [query, setQuery] = useState('')
   const [timeFilter, setTimeFilter] = useState('all')
-  const [results, setResults] = useState<any[]>([])
+  const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedResults, setSelectedResults] = useState<string[]>([])
   const [reportPrompt, setReportPrompt] = useState('')
@@ -50,6 +58,7 @@ export default function Home() {
     total: number
     successful: number
   }>({ total: 0, successful: 0 })
+  const [newUrl, setNewUrl] = useState('')
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,7 +87,8 @@ export default function Home() {
       }
 
       const data = await response.json()
-      setResults(data.webPages?.value || [])
+      const customUrls = results.filter((r) => r.isCustomUrl)
+      setResults([...customUrls, ...(data.webPages?.value || [])])
     } catch (error) {
       console.error('Search failed:', error)
       setError(error instanceof Error ? error.message : 'Search failed')
@@ -97,6 +107,33 @@ export default function Home() {
       }
       return [...prev, resultId]
     })
+  }
+
+  const handleAddCustomUrl = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newUrl.trim()) return
+
+    try {
+      new URL(newUrl) // Validate URL format
+      if (!results.some((r) => r.url === newUrl)) {
+        const newResult: SearchResult = {
+          id: `custom-${newUrl}`,
+          url: newUrl,
+          name: 'Custom URL',
+          snippet: 'Custom URL added by user',
+          isCustomUrl: true,
+        }
+        setResults((prev) => [newResult, ...prev])
+      }
+      setNewUrl('')
+    } catch {
+      setError('Please enter a valid URL')
+    }
+  }
+
+  const handleRemoveResult = (resultId: string) => {
+    setResults((prev) => prev.filter((r) => r.id !== resultId))
+    setSelectedResults((prev) => prev.filter((id) => id !== resultId))
   }
 
   const handleGenerateReport = async () => {
@@ -356,6 +393,21 @@ export default function Home() {
           </form>
         </div>
 
+        <div className='mb-6'>
+          <form onSubmit={handleAddCustomUrl} className='flex gap-2 mb-2'>
+            <Input
+              type='url'
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder='Add custom URL...'
+              className='flex-1'
+            />
+            <Button type='submit' variant='outline' size='icon'>
+              <Plus className='h-4 w-4' />
+            </Button>
+          </form>
+        </div>
+
         {results.length > 0 && (
           <Tabs
             value={activeTab}
@@ -378,7 +430,7 @@ export default function Home() {
                 <Button
                   onClick={handleGenerateReport}
                   disabled={
-                    selectedResults.length === 0 ||
+                    (selectedResults.length === 0 && results.length === 0) ||
                     !reportPrompt ||
                     generatingReport
                   }
@@ -411,42 +463,91 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value='search' className='space-y-4'>
-              {results.map((result) => (
-                <Card key={result.id} className='overflow-hidden'>
-                  <CardContent className='p-4 flex gap-4'>
-                    <div className='pt-1'>
-                      <Checkbox
-                        checked={selectedResults.includes(result.id)}
-                        onCheckedChange={() => handleResultSelect(result.id)}
-                        disabled={
-                          !selectedResults.includes(result.id) &&
-                          selectedResults.length >= MAX_SELECTIONS
-                        }
-                      />
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <a
-                        href={result.url}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-blue-600 hover:underline'
-                      >
-                        <h2
-                          className='text-xl font-semibold truncate'
-                          dangerouslySetInnerHTML={{ __html: result.name }}
+              {results
+                .filter((r) => r.isCustomUrl)
+                .map((result) => (
+                  <Card
+                    key={result.id}
+                    className='overflow-hidden border-2 border-blue-100'
+                  >
+                    <CardContent className='p-4 flex gap-4'>
+                      <div className='pt-1'>
+                        <Checkbox
+                          checked={selectedResults.includes(result.id)}
+                          onCheckedChange={() => handleResultSelect(result.id)}
+                          disabled={
+                            !selectedResults.includes(result.id) &&
+                            selectedResults.length >= MAX_SELECTIONS
+                          }
                         />
-                      </a>
-                      <p className='text-green-700 text-sm truncate'>
-                        {result.url}
-                      </p>
-                      <p
-                        className='mt-1 text-gray-600 line-clamp-2'
-                        dangerouslySetInnerHTML={{ __html: result.snippet }}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex justify-between items-start'>
+                          <a
+                            href={result.url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-600 hover:underline'
+                          >
+                            <h2 className='text-xl font-semibold truncate'>
+                              {result.name}
+                            </h2>
+                          </a>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleRemoveResult(result.id)}
+                            className='ml-2'
+                          >
+                            <X className='h-4 w-4' />
+                          </Button>
+                        </div>
+                        <p className='text-green-700 text-sm truncate'>
+                          {result.url}
+                        </p>
+                        <p className='mt-1 text-gray-600 line-clamp-2'>
+                          {result.snippet}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+              {results
+                .filter((r) => !r.isCustomUrl)
+                .map((result) => (
+                  <Card key={result.id} className='overflow-hidden'>
+                    <CardContent className='p-4 flex gap-4'>
+                      <div className='pt-1'>
+                        <Checkbox
+                          checked={selectedResults.includes(result.id)}
+                          onCheckedChange={() => handleResultSelect(result.id)}
+                          disabled={
+                            !selectedResults.includes(result.id) &&
+                            selectedResults.length >= MAX_SELECTIONS
+                          }
+                        />
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <h2 className='text-xl font-semibold truncate text-blue-600 hover:underline'>
+                          <a
+                            href={result.url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            dangerouslySetInnerHTML={{ __html: result.name }}
+                          />
+                        </h2>
+                        <p className='text-green-700 text-sm truncate'>
+                          {result.url}
+                        </p>
+                        <p
+                          className='mt-1 text-gray-600 line-clamp-2'
+                          dangerouslySetInnerHTML={{ __html: result.snippet }}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </TabsContent>
 
             <TabsContent value='report'>
