@@ -31,6 +31,8 @@ Your report should:
 4. Use markdown formatting for emphasis, lists, and structure
 5. Integrate information from sources naturally without explicitly referencing them by number
 6. Maintain objectivity while addressing the specific aspects requested in the prompt
+7. Compare and contrast the information from each source, noting areas of consensus or points of contention. 
+8. Showcase key insights, important data, or innovative ideas.
 
 Here are the source articles to analyze:
 
