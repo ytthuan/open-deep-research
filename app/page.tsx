@@ -66,7 +66,6 @@ export default function Home() {
 
     setLoading(true)
     setError(null)
-    setSelectedResults([])
     setReportPrompt('')
     try {
       const response = await fetch('/api/search', {
@@ -87,8 +86,50 @@ export default function Home() {
       }
 
       const data = await response.json()
-      const customUrls = results.filter((r) => r.isCustomUrl)
-      setResults([...customUrls, ...(data.webPages?.value || [])])
+
+      // Create a Set to track unique IDs
+      const seenIds = new Set<string>()
+      const uniqueResults: SearchResult[] = []
+
+      // First add selected items
+      results
+        .filter((r) => selectedResults.includes(r.id))
+        .forEach((item) => {
+          if (!seenIds.has(item.id)) {
+            uniqueResults.push(item)
+            seenIds.add(item.id)
+          }
+        })
+
+      // Then add custom URLs
+      results
+        .filter((r) => r.isCustomUrl)
+        .forEach((item) => {
+          if (!seenIds.has(item.id)) {
+            uniqueResults.push(item)
+            seenIds.add(item.id)
+          }
+        })
+
+      // Finally add new search results
+      const timestamp = Date.now()
+      const newResults = (data.webPages?.value || [])
+        .map((result: SearchResult) => ({
+          ...result,
+          id: `search-${timestamp}-${result.id || result.url}`,
+        }))
+        .filter(
+          (newResult: SearchResult) =>
+            !uniqueResults.some((existing) => existing.url === newResult.url)
+        )
+        .forEach((item: SearchResult) => {
+          if (!seenIds.has(item.id)) {
+            uniqueResults.push(item)
+            seenIds.add(item.id)
+          }
+        })
+
+      setResults(uniqueResults)
     } catch (error) {
       console.error('Search failed:', error)
       setError(error instanceof Error ? error.message : 'Search failed')
@@ -116,8 +157,9 @@ export default function Home() {
     try {
       new URL(newUrl) // Validate URL format
       if (!results.some((r) => r.url === newUrl)) {
+        const timestamp = Date.now()
         const newResult: SearchResult = {
-          id: `custom-${newUrl}`,
+          id: `custom-${timestamp}-${newUrl}`,
           url: newUrl,
           name: 'Custom URL',
           snippet: 'Custom URL added by user',
