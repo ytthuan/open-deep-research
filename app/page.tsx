@@ -122,14 +122,8 @@ export default function Home() {
           (newResult: SearchResult) =>
             !uniqueResults.some((existing) => existing.url === newResult.url)
         )
-        .forEach((item: SearchResult) => {
-          if (!seenIds.has(item.id)) {
-            uniqueResults.push(item)
-            seenIds.add(item.id)
-          }
-        })
 
-      setResults(uniqueResults)
+      setResults([...uniqueResults, ...newResults])
     } catch (error) {
       console.error('Search failed:', error)
       setError(error instanceof Error ? error.message : 'Search failed')
