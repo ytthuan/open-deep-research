@@ -65,8 +65,7 @@ async function generateWithAnthropic(systemPrompt: string, model: string) {
         content: systemPrompt,
       },
     ],
-  })
-  // @ts-ignore
+  })  
   return response.content[0].text || ''
 }
 
