@@ -38,6 +38,13 @@ type SearchResult = {
   isCustomUrl?: boolean
 }
 
+type PlatformModel = {
+  value: string
+  label: string
+  platform: string
+  disabled: boolean
+}
+
 const timeFilters = [
   { value: 'all', label: 'Any time' },
   { value: '24h', label: 'Past 24 hours' },
@@ -46,56 +53,22 @@ const timeFilters = [
   { value: 'year', label: 'Past year' },
 ] as const
 
-const platformModels = [
-  ...(CONFIG.platforms.google.enabled
-    ? [
-        {
-          value: 'google__gemini-flash',
-          label: 'Google - Gemini Flash',
-          platform: 'google',
-        },
-        {
-          value: 'google__gemini-flash-thinking',
-          label: 'Google - Gemini Flash Thinking',
-          platform: 'google',
-        },
-        {
-          value: 'google__gemini-exp',
-          label: 'Google - Gemini Exp',
-          platform: 'google',
-        },
-      ]
-    : []),
-  ...(CONFIG.platforms.openai.enabled
-    ? [
-        {
-          value: 'openai__gpt-4o',
-          label: 'OpenAI - GPT-4o',
-          platform: 'openai',
-        },
-        {
-          value: 'openai__o1-mini',
-          label: 'OpenAI - O1 Mini',
-          platform: 'openai',
-        },
-        { value: 'openai__o1', label: 'OpenAI - O1', platform: 'openai' },
-      ]
-    : []),
-  ...(CONFIG.platforms.anthropic.enabled
-    ? [
-        {
-          value: 'anthropic__sonnet-3.5',
-          label: 'Anthropic - Claude 3 Sonnet',
-          platform: 'anthropic',
-        },
-        {
-          value: 'anthropic__haiku-3.5',
-          label: 'Anthropic - Claude 3 Haiku',
-          platform: 'anthropic',
-        },
-      ]
-    : []),
-] as const
+const platformModels = Object.entries(CONFIG.platforms)
+  .flatMap(([platform, config]) => {
+    if (!config.enabled) return []
+
+    return Object.entries(config.models).map(([modelId, modelConfig]) => {
+      return {
+        value: `${platform}__${modelId}`,
+        label: `${platform.charAt(0).toUpperCase() + platform.slice(1)} - ${
+          modelConfig.label
+        }`,
+        platform,
+        disabled: !modelConfig.enabled,
+      }
+    })
+  })
+  .filter(Boolean) as (PlatformModel & { disabled: boolean })[]
 
 const MAX_SELECTIONS = CONFIG.search.maxSelectableResults
 
@@ -523,7 +496,16 @@ export default function Home() {
                     </SelectTrigger>
                     <SelectContent>
                       {platformModels.map((model) => (
-                        <SelectItem key={model.value} value={model.value}>
+                        <SelectItem
+                          key={model.value}
+                          value={model.value}
+                          disabled={model.disabled}
+                          className={
+                            model.disabled
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : ''
+                          }
+                        >
                           {model.label}
                         </SelectItem>
                       ))}

@@ -98,13 +98,31 @@ export async function POST(request: Request) {
 
     // Check if selected platform is enabled
     const platform = platformModel.split('__')[0]
-    if (!CONFIG.platforms[platform as keyof typeof CONFIG.platforms].enabled) {
+    const model = platformModel.split('__')[1]
+
+    const platformConfig =
+      CONFIG.platforms[platform as keyof typeof CONFIG.platforms]
+    if (!platformConfig?.enabled) {
       return NextResponse.json(
         { error: `${platform} platform is not enabled` },
         { status: 400 }
       )
     }
-    const model = platformModel.split('__')[1]
+
+    // Check if selected model exists and is enabled
+    const modelConfig = (platformConfig as any).models[model]
+    if (!modelConfig) {
+      return NextResponse.json(
+        { error: `${model} model does not exist` },
+        { status: 400 }
+      )
+    }
+    if (!modelConfig.enabled) {
+      return NextResponse.json(
+        { error: `${model} model is disabled` },
+        { status: 400 }
+      )
+    }
 
     const generateSystemPrompt = (articles: Article[], userPrompt: string) => {
       return `You are a research assistant tasked with creating a comprehensive report based on multiple sources. 

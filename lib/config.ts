@@ -19,12 +19,50 @@ export const CONFIG = {
   platforms: {
     google: {
       enabled: true,
+      models: {
+        'gemini-flash': {
+          enabled: true,
+          label: 'Gemini Flash',
+        },
+        'gemini-flash-thinking': {
+          enabled: true,
+          label: 'Gemini Flash Thinking',
+        },
+        'gemini-exp': {
+          enabled: false,
+          label: 'Gemini Exp',
+        },
+      },
     },
     openai: {
       enabled: true,
+      models: {
+        'gpt-4o': {
+          enabled: false,
+          label: 'GPT-4o',
+        },
+        'o1-mini': {
+          enabled: false,
+          label: 'O1 Mini',
+        },
+        o1: {
+          enabled: false,
+          label: 'O1',
+        },
+      },
     },
     anthropic: {
       enabled: true,
+      models: {
+        'sonnet-3.5': {
+          enabled: false,
+          label: 'Claude 3 Sonnet',
+        },
+        'haiku-3.5': {
+          enabled: false,
+          label: 'Claude 3 Haiku',
+        },
+      },
     },
   },
 } as const
