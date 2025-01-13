@@ -62,7 +62,9 @@ export default function Home() {
   const [fetchStatus, setFetchStatus] = useState<{
     total: number
     successful: number
-  }>({ total: 0, successful: 0 })
+    fallback: number
+    sourceStatuses: Record<string, 'fetched' | 'preview'>
+  }>({ total: 0, successful: 0, fallback: 0, sourceStatuses: {} })
   const [newUrl, setNewUrl] = useState('')
   const [isSourcesOpen, setIsSourcesOpen] = useState(false)
 
@@ -183,7 +185,12 @@ export default function Home() {
 
     setGeneratingReport(true)
     setError(null)
-    setFetchStatus({ total: selectedResults.length, successful: 0 })
+    setFetchStatus({
+      total: selectedResults.length,
+      successful: 0,
+      fallback: 0,
+      sourceStatuses: {},
+    })
 
     try {
       const selectedArticles = results.filter((r) =>
@@ -214,6 +221,10 @@ export default function Home() {
             setFetchStatus((prev) => ({
               ...prev,
               successful: prev.successful + 1,
+              sourceStatuses: {
+                ...prev.sourceStatuses,
+                [article.url]: 'fetched',
+              },
             }))
           } else if (response.status === 429) {
             hitRateLimit = true
@@ -254,6 +265,14 @@ export default function Home() {
               title: article.name,
               content: article.snippet,
             })
+            setFetchStatus((prev) => ({
+              ...prev,
+              fallback: prev.fallback + 1,
+              sourceStatuses: {
+                ...prev.sourceStatuses,
+                [article.url]: 'preview',
+              },
+            }))
           }
         } catch (error) {
           if (hitRateLimit) throw error
@@ -263,6 +282,10 @@ export default function Home() {
             title: article.name,
             content: article.snippet,
           })
+          setFetchStatus((prev) => ({
+            ...prev,
+            fallback: prev.fallback + 1,
+          }))
         }
       }
 
@@ -499,8 +522,8 @@ export default function Home() {
                 </p>
                 {generatingReport && (
                   <p>
-                    Fetching content: {fetchStatus.successful} of{' '}
-                    {fetchStatus.total} successful
+                    {fetchStatus.successful} fetched, {fetchStatus.fallback}{' '}
+                    failed (of {fetchStatus.total})
                   </p>
                 )}
               </div>
@@ -611,31 +634,52 @@ export default function Home() {
                       className='w-full border rounded-lg p-2'
                     >
                       <CollapsibleTrigger className='flex items-center justify-between w-full'>
-                        <span className='text-sm font-medium'>
-                          Source Links ({report.sources.length})
-                        </span>
+                        <span className='text-sm font-medium'>Overview</span>
                         <ChevronDown
                           className={`h-4 w-4 transition-transform ${
                             isSourcesOpen ? 'transform rotate-180' : ''
                           }`}
                         />
                       </CollapsibleTrigger>
-                      <CollapsibleContent className='space-y-2 mt-2'>
-                        {report.sources.map((source) => (
-                          <div key={source.id} className='text-gray-600'>
-                            <a
-                              href={source.url}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:underline'
-                            >
-                              {source.name}
-                            </a>
-                            <p className='text-sm text-gray-500'>
-                              {source.url}
-                            </p>
-                          </div>
-                        ))}
+                      <CollapsibleContent className='space-y-4 mt-2'>
+                        <div className='text-sm text-gray-600 bg-gray-50 p-3 rounded'>
+                          <p className='font-medium text-gray-700'>
+                            {fetchStatus.successful} of {report.sources.length}{' '}
+                            sources fetched successfully
+                          </p>
+                        </div>
+                        <div className='space-y-2'>
+                          {report.sources.map((source) => (
+                            <div key={source.id} className='text-gray-600'>
+                              <div className='flex items-center gap-2'>
+                                <a
+                                  href={source.url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  className='text-blue-600 hover:underline'
+                                >
+                                  {source.name}
+                                </a>
+                                <span
+                                  className={`text-xs px-1.5 py-0.5 rounded ${
+                                    fetchStatus.sourceStatuses[source.url] ===
+                                    'fetched'
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-yellow-50 text-yellow-600'
+                                  }`}
+                                >
+                                  {fetchStatus.sourceStatuses[source.url] ===
+                                  'fetched'
+                                    ? 'fetched'
+                                    : 'preview'}
+                                </span>
+                              </div>
+                              <p className='text-sm text-gray-500'>
+                                {source.url}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </CollapsibleContent>
                     </Collapsible>
                     <div className='flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-4'>
