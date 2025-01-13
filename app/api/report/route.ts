@@ -90,7 +90,7 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
       }
 
       try {
-        let reportData = JSON.parse(jsonMatch)
+        const reportData = JSON.parse(jsonMatch)
         // Add sources to the report data
         reportData.sources = sources
         console.log('Parsed report data:', reportData)
