@@ -28,9 +28,17 @@ type PlatformModel =
   | 'sonnet-3.5'
   | 'haiku-3.5'
 
-async function generateWithGemini(systemPrompt: string) {
-  const result = await geminiModel.generateContent(systemPrompt)
-  return result.response.text()
+async function generateWithGemini(systemPrompt: string, model: string) {
+  if (model === 'gemini-flash-thinking') {
+    const result = await geminiFlashThinkingModel.generateContent(systemPrompt)
+    return result.response.text()
+  } else if (model === 'gemini-exp') {
+    const result = await geminiModel.generateContent(systemPrompt)
+    return result.response.text()
+  } else {
+    const result = await geminiFlashModel.generateContent(systemPrompt)
+    return result.response.text()
+  }
 }
 
 async function generateWithOpenAI(systemPrompt: string, model: string) {
@@ -154,16 +162,18 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
 
     try {
       let response: string | null = null
-      console.log('Model:', model)
       switch (model) {
         case 'gemini-flash':
-          response = await generateWithGemini(systemPrompt)
+          response = await generateWithGemini(systemPrompt, 'gemini-flash')
           break
         case 'gemini-flash-thinking':
-          response = await generateWithGemini(systemPrompt)
+          response = await generateWithGemini(
+            systemPrompt,
+            'gemini-flash-thinking'
+          )
           break
         case 'gemini-exp':
-          response = await generateWithGemini(systemPrompt)
+          response = await generateWithGemini(systemPrompt, 'gemini-exp')
           break
         case 'gpt-4o':
           response = await generateWithOpenAI(systemPrompt, 'gpt-4o')
