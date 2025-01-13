@@ -92,7 +92,7 @@ export default function Home() {
   const [newUrl, setNewUrl] = useState('')
   const [isSourcesOpen, setIsSourcesOpen] = useState(false)
   const [selectedModel, setSelectedModel] = useState<string>(
-    'google-gemini-flash'
+    'google__gemini-flash'
   )
 
   const handleSearch = async (e: React.FormEvent) => {
