@@ -7,7 +7,7 @@ import { CONFIG } from '@/lib/config'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { selectedResults, prompt } = body
+    const { selectedResults, sources, prompt } = body
 
     // Only check rate limit if enabled
     if (CONFIG.rateLimits.enabled) {
@@ -90,7 +90,9 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
       }
 
       try {
-        const reportData = JSON.parse(jsonMatch)
+        let reportData = JSON.parse(jsonMatch)
+        // Add sources to the report data
+        reportData.sources = sources
         console.log('Parsed report data:', reportData)
         return NextResponse.json(reportData)
       } catch (parseError) {

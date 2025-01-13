@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, FileText, Download, Plus, X } from 'lucide-react'
+import { Search, FileText, Download, Plus, X, ChevronDown } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -24,6 +24,11 @@ import { type Report } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CONFIG } from '@/lib/config'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 
 type SearchResult = {
   id: string
@@ -59,6 +64,7 @@ export default function Home() {
     successful: number
   }>({ total: 0, successful: 0 })
   const [newUrl, setNewUrl] = useState('')
+  const [isSourcesOpen, setIsSourcesOpen] = useState(false)
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -216,6 +222,7 @@ export default function Home() {
               title: 'Rate Limit Reached',
               summary:
                 "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+              sources: [],
               sections: [
                 {
                   title: 'What this means',
@@ -278,6 +285,13 @@ export default function Home() {
         },
         body: JSON.stringify({
           selectedResults: successfulResults,
+          sources: results
+            .filter((r) => selectedResults.includes(r.id))
+            .map((r) => ({
+              id: r.id,
+              url: r.url,
+              name: r.name,
+            })),
           prompt: `${reportPrompt}. Provide a comprehensive analysis that synthesizes all relevant information from the provided sources.`,
         }),
       })
@@ -289,6 +303,7 @@ export default function Home() {
             title: 'Rate Limit Reached',
             summary:
               "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
+            sources: [],
             sections: [
               {
                 title: 'What this means',
@@ -590,6 +605,39 @@ export default function Home() {
               {report && (
                 <Card>
                   <CardContent className='p-6 space-y-6'>
+                    <Collapsible
+                      open={isSourcesOpen}
+                      onOpenChange={setIsSourcesOpen}
+                      className='w-full border rounded-lg p-2'
+                    >
+                      <CollapsibleTrigger className='flex items-center justify-between w-full'>
+                        <span className='text-sm font-medium'>
+                          Source Links ({report.sources.length})
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${
+                            isSourcesOpen ? 'transform rotate-180' : ''
+                          }`}
+                        />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className='space-y-2 mt-2'>
+                        {report.sources.map((source) => (
+                          <div key={source.id} className='text-gray-600'>
+                            <a
+                              href={source.url}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-blue-600 hover:underline'
+                            >
+                              {source.name}
+                            </a>
+                            <p className='text-sm text-gray-500'>
+                              {source.url}
+                            </p>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
                     <div className='flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-4'>
                       <h2 className='text-2xl font-bold text-gray-800 text-center sm:text-left'>
                         {report.title}

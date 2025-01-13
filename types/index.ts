@@ -4,9 +4,16 @@ export interface Article {
   content: string
 }
 
+export interface Source {
+  id: string
+  url: string
+  name: string
+}
+
 export interface Report {
   title: string
   summary: string
+  sources: Source[]
   sections: {
     title: string
     content: string
