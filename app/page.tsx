@@ -47,18 +47,54 @@ const timeFilters = [
 ] as const
 
 const platformModels = [
-  ...(CONFIG.platforms.google.enabled ? [
-    { value: 'google__gemini-flash', label: 'Google - Gemini Flash', platform: 'google' }
-  ] : []),
-  ...(CONFIG.platforms.openai.enabled ? [
-    { value: 'openai__gpt-4o', label: 'OpenAI - GPT-4o', platform: 'openai' },
-    { value: 'openai__o1-mini', label: 'OpenAI - O1 Mini', platform: 'openai' },
-    { value: 'openai__o1', label: 'OpenAI - O1', platform: 'openai' }
-  ] : []),
-  ...(CONFIG.platforms.anthropic.enabled ? [
-    { value: 'anthropic__sonnet-3.5', label: 'Anthropic - Claude 3 Sonnet', platform: 'anthropic' },
-    { value: 'anthropic__haiku-3.5', label: 'Anthropic - Claude 3 Haiku', platform: 'anthropic' }
-  ] : [])
+  ...(CONFIG.platforms.google.enabled
+    ? [
+        {
+          value: 'google__gemini-flash',
+          label: 'Google - Gemini Flash',
+          platform: 'google',
+        },
+        {
+          value: 'google__gemini-flash-thinking',
+          label: 'Google - Gemini Flash Thinking',
+          platform: 'google',
+        },
+        {
+          value: 'google__gemini-exp',
+          label: 'Google - Gemini Exp',
+          platform: 'google',
+        },
+      ]
+    : []),
+  ...(CONFIG.platforms.openai.enabled
+    ? [
+        {
+          value: 'openai__gpt-4o',
+          label: 'OpenAI - GPT-4o',
+          platform: 'openai',
+        },
+        {
+          value: 'openai__o1-mini',
+          label: 'OpenAI - O1 Mini',
+          platform: 'openai',
+        },
+        { value: 'openai__o1', label: 'OpenAI - O1', platform: 'openai' },
+      ]
+    : []),
+  ...(CONFIG.platforms.anthropic.enabled
+    ? [
+        {
+          value: 'anthropic__sonnet-3.5',
+          label: 'Anthropic - Claude 3 Sonnet',
+          platform: 'anthropic',
+        },
+        {
+          value: 'anthropic__haiku-3.5',
+          label: 'Anthropic - Claude 3 Haiku',
+          platform: 'anthropic',
+        },
+      ]
+    : []),
 ] as const
 
 const MAX_SELECTIONS = CONFIG.search.maxSelectableResults
@@ -82,7 +118,9 @@ export default function Home() {
   }>({ total: 0, successful: 0, fallback: 0, sourceStatuses: {} })
   const [newUrl, setNewUrl] = useState('')
   const [isSourcesOpen, setIsSourcesOpen] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<string>('google-gemini-flash')
+  const [selectedModel, setSelectedModel] = useState<string>(
+    'google-gemini-flash'
+  )
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -469,20 +507,23 @@ export default function Home() {
                   <FileText className='absolute right-2 top-2.5 h-5 w-5 text-gray-400' />
                 </div>
                 <div className='flex flex-col sm:flex-row gap-2'>
-                  <Select 
-                    value={selectedModel} 
+                  <Select
+                    value={selectedModel}
                     onValueChange={setSelectedModel}
                     disabled={platformModels.length === 0}
                   >
                     <SelectTrigger className='w-full sm:w-[200px]'>
-                      <SelectValue placeholder={platformModels.length === 0 ? 'No models available' : 'Select model'} />
+                      <SelectValue
+                        placeholder={
+                          platformModels.length === 0
+                            ? 'No models available'
+                            : 'Select model'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {platformModels.map((model) => (
-                        <SelectItem 
-                          key={model.value} 
-                          value={model.value}
-                        >
+                        <SelectItem key={model.value} value={model.value}>
                           {model.label}
                         </SelectItem>
                       ))}

@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
-import { geminiModel } from '@/lib/gemini'
+import {
+  geminiModel,
+  geminiFlashModel,
+  geminiFlashThinkingModel,
+} from '@/lib/gemini'
 import { reportContentRatelimit } from '@/lib/redis'
 import { type Article } from '@/types'
 import { CONFIG } from '@/lib/config'
@@ -15,7 +19,9 @@ const anthropic = new Anthropic({
 })
 
 type PlatformModel =
-  | 'google-gemini-flash'
+  | 'google__gemini-flash'
+  | 'google__gemini-flash-thinking'
+  | 'google__gemini-exp'
   | 'gpt-4o'
   | 'o1-mini'
   | 'o1'
@@ -150,7 +156,13 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
       let response: string | null = null
       console.log('Model:', model)
       switch (model) {
-        case 'google-gemini-flash':
+        case 'gemini-flash':
+          response = await generateWithGemini(systemPrompt)
+          break
+        case 'gemini-flash-thinking':
+          response = await generateWithGemini(systemPrompt)
+          break
+        case 'gemini-exp':
           response = await generateWithGemini(systemPrompt)
           break
         case 'gpt-4o':
