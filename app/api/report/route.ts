@@ -3,11 +3,73 @@ import { geminiModel } from '@/lib/gemini'
 import { reportContentRatelimit } from '@/lib/redis'
 import { type Article } from '@/types'
 import { CONFIG } from '@/lib/config'
+import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+})
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+})
+
+type PlatformModel =
+  | 'google-gemini-flash'
+  | 'gpt-4o'
+  | 'o1-mini'
+  | 'o1'
+  | 'sonnet-3.5'
+  | 'haiku-3.5'
+
+async function generateWithGemini(systemPrompt: string) {
+  const result = await geminiModel.generateContent(systemPrompt)
+  return result.response.text()
+}
+
+async function generateWithOpenAI(systemPrompt: string, model: string) {
+  const response = await openai.chat.completions.create({
+    model,
+    messages: [
+      {
+        role: 'user',
+        content: systemPrompt,
+      },
+    ],
+  })
+  return response.choices[0].message.content
+}
+
+async function generateWithAnthropic(systemPrompt: string, model: string) {
+  const response = await anthropic.messages.create({
+    model,
+    max_tokens: 3500,
+    temperature: 0.9,
+    messages: [
+      {
+        role: 'user',
+        content: systemPrompt,
+      },
+    ],
+  })
+  // @ts-ignore
+  return response.content[0].text || ''
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { selectedResults, sources, prompt } = body
+    const {
+      selectedResults,
+      sources,
+      prompt,
+      platformModel = 'google-gemini-flash',
+    } = body as {
+      selectedResults: Article[]
+      sources: any[]
+      prompt: string
+      platformModel: PlatformModel
+    }
 
     // Only check rate limit if enabled
     if (CONFIG.rateLimits.enabled) {
@@ -19,6 +81,16 @@ export async function POST(request: Request) {
         )
       }
     }
+
+    // Check if selected platform is enabled
+    const platform = platformModel.split('__')[0]
+    if (!CONFIG.platforms[platform as keyof typeof CONFIG.platforms].enabled) {
+      return NextResponse.json(
+        { error: `${platform} platform is not enabled` },
+        { status: 400 }
+      )
+    }
+    const model = platformModel.split('__')[1]
 
     const generateSystemPrompt = (articles: Article[], userPrompt: string) => {
       return `You are a research assistant tasked with creating a comprehensive report based on multiple sources. 
@@ -72,12 +144,43 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
 
     const systemPrompt = generateSystemPrompt(selectedResults, prompt)
 
-    console.log('Sending prompt to Gemini:', systemPrompt)
+    // console.log('Sending prompt to model:', systemPrompt)
 
     try {
-      const result = await geminiModel.generateContent(systemPrompt)
-      const response = result.response.text()
-      // console.log('Raw Gemini response:', response)
+      let response: string | null = null
+      console.log('Model:', model)
+      switch (model) {
+        case 'google-gemini-flash':
+          response = await generateWithGemini(systemPrompt)
+          break
+        case 'gpt-4o':
+          response = await generateWithOpenAI(systemPrompt, 'gpt-4o')
+          break
+        case 'o1-mini':
+          response = await generateWithOpenAI(systemPrompt, 'o1-mini')
+          break
+        case 'o1':
+          response = await generateWithOpenAI(systemPrompt, 'o1')
+          break
+        case 'sonnet-3.5':
+          response = await generateWithAnthropic(
+            systemPrompt,
+            'claude-3-5-sonnet-latest'
+          )
+          break
+        case 'haiku-3.5':
+          response = await generateWithAnthropic(
+            systemPrompt,
+            'claude-3-5-haiku-latest'
+          )
+          break
+        default:
+          throw new Error('Invalid platform/model combination')
+      }
+
+      if (!response) {
+        throw new Error('No response from model')
+      }
 
       // Extract JSON using regex
       const jsonMatch = response.match(/\{[\s\S]*\}/)?.[0]
@@ -103,7 +206,7 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
         )
       }
     } catch (error) {
-      console.error('Gemini generation error:', error)
+      console.error('Model generation error:', error)
       return NextResponse.json(
         { error: 'Failed to generate report content' },
         { status: 500 }

@@ -14,4 +14,17 @@ export const CONFIG = {
     safeSearch: 'Moderate' as const,
     market: 'en-US',
   },
+
+  // AI Platform settings
+  platforms: {
+    google: {
+      enabled: true,
+    },
+    openai: {
+      enabled: true,
+    },
+    anthropic: {
+      enabled: true,
+    },
+  },
 } as const

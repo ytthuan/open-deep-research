@@ -46,6 +46,21 @@ const timeFilters = [
   { value: 'year', label: 'Past year' },
 ] as const
 
+const platformModels = [
+  ...(CONFIG.platforms.google.enabled ? [
+    { value: 'google__gemini-flash', label: 'Google - Gemini Flash', platform: 'google' }
+  ] : []),
+  ...(CONFIG.platforms.openai.enabled ? [
+    { value: 'openai__gpt-4o', label: 'OpenAI - GPT-4o', platform: 'openai' },
+    { value: 'openai__o1-mini', label: 'OpenAI - O1 Mini', platform: 'openai' },
+    { value: 'openai__o1', label: 'OpenAI - O1', platform: 'openai' }
+  ] : []),
+  ...(CONFIG.platforms.anthropic.enabled ? [
+    { value: 'anthropic__sonnet-3.5', label: 'Anthropic - Claude 3 Sonnet', platform: 'anthropic' },
+    { value: 'anthropic__haiku-3.5', label: 'Anthropic - Claude 3 Haiku', platform: 'anthropic' }
+  ] : [])
+] as const
+
 const MAX_SELECTIONS = CONFIG.search.maxSelectableResults
 
 export default function Home() {
@@ -67,6 +82,7 @@ export default function Home() {
   }>({ total: 0, successful: 0, fallback: 0, sourceStatuses: {} })
   const [newUrl, setNewUrl] = useState('')
   const [isSourcesOpen, setIsSourcesOpen] = useState(false)
+  const [selectedModel, setSelectedModel] = useState<string>('google-gemini-flash')
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -228,31 +244,6 @@ export default function Home() {
             }))
           } else if (response.status === 429) {
             hitRateLimit = true
-            // Create a friendly report for rate limit
-            setReport({
-              title: 'Rate Limit Reached',
-              summary:
-                "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
-              sources: [],
-              sections: [
-                {
-                  title: 'What this means',
-                  content:
-                    'To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period.',
-                },
-                {
-                  title: 'What you can do',
-                  content:
-                    'Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime.',
-                },
-                {
-                  title: 'Why we do this',
-                  content:
-                    'Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible.',
-                },
-              ],
-            })
-            setActiveTab('report')
             throw new Error(
               'Rate limit exceeded. Please wait a moment before generating another report.'
             )
@@ -316,36 +307,12 @@ export default function Home() {
               name: r.name,
             })),
           prompt: `${reportPrompt}. Provide a comprehensive analysis that synthesizes all relevant information from the provided sources.`,
+          platformModel: selectedModel,
         }),
       })
 
       if (!response.ok) {
         if (response.status === 429) {
-          // Create a friendly report for rate limit
-          setReport({
-            title: 'Rate Limit Reached',
-            summary:
-              "You've reached the rate limit for report generation. This helps us ensure fair usage of the service.",
-            sources: [],
-            sections: [
-              {
-                title: 'What this means',
-                content:
-                  'To prevent abuse and ensure everyone can use the service fairly, we limit how many reports can be generated in a short time period.',
-              },
-              {
-                title: 'What you can do',
-                content:
-                  'Please wait a moment before generating another report. You can continue browsing search results or refine your selection in the meantime.',
-              },
-              {
-                title: 'Why we do this',
-                content:
-                  'Rate limiting helps us maintain service quality and availability for all users while keeping the service free and accessible.',
-              },
-            ],
-          })
-          setActiveTab('report')
           throw new Error(
             'Rate limit exceeded. Please wait a moment before generating another report.'
           )
@@ -501,18 +468,40 @@ export default function Home() {
                   />
                   <FileText className='absolute right-2 top-2.5 h-5 w-5 text-gray-400' />
                 </div>
-                <Button
-                  onClick={handleGenerateReport}
-                  disabled={
-                    (selectedResults.length === 0 && results.length === 0) ||
-                    !reportPrompt ||
-                    generatingReport
-                  }
-                  variant='secondary'
-                  className='w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white disabled:bg-green-300'
-                >
-                  {generatingReport ? 'Generating...' : 'Generate Report'}
-                </Button>
+                <div className='flex flex-col sm:flex-row gap-2'>
+                  <Select 
+                    value={selectedModel} 
+                    onValueChange={setSelectedModel}
+                    disabled={platformModels.length === 0}
+                  >
+                    <SelectTrigger className='w-full sm:w-[200px]'>
+                      <SelectValue placeholder={platformModels.length === 0 ? 'No models available' : 'Select model'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {platformModels.map((model) => (
+                        <SelectItem 
+                          key={model.value} 
+                          value={model.value}
+                        >
+                          {model.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={handleGenerateReport}
+                    disabled={
+                      (selectedResults.length === 0 && results.length === 0) ||
+                      !reportPrompt ||
+                      generatingReport ||
+                      platformModels.length === 0
+                    }
+                    variant='secondary'
+                    className='w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white disabled:bg-green-300'
+                  >
+                    {generatingReport ? 'Generating...' : 'Generate Report'}
+                  </Button>
+                </div>
               </div>
               <div className='text-sm text-gray-600 text-center sm:text-left space-y-1'>
                 <p>
