@@ -59,6 +59,70 @@ search: {
 }
 ```
 
+### AI Platform Settings
+
+Configure which AI platforms and models are available:
+
+```typescript
+platforms: {
+  google: {
+    enabled: true,
+    models: {
+      'gemini-flash': {
+        enabled: true,
+        label: 'Gemini Flash',
+      },
+      'gemini-flash-thinking': {
+        enabled: true,
+        label: 'Gemini Flash Thinking',
+      },
+      'gemini-exp': {
+        enabled: false,
+        label: 'Gemini Exp',
+      },
+    },
+  },
+  openai: {
+    enabled: true,
+    models: {
+      'gpt-4o': {
+        enabled: false,
+        label: 'GPT-4o',
+      },
+      'o1-mini': {
+        enabled: false,
+        label: 'O1 Mini',
+      },
+      'o1': {
+        enabled: false,
+        label: 'O1',
+      },
+    },
+  },
+  anthropic: {
+    enabled: true,
+    models: {
+      'sonnet-3.5': {
+        enabled: false,
+        label: 'Claude 3 Sonnet',
+      },
+      'haiku-3.5': {
+        enabled: false,
+        label: 'Claude 3 Haiku',
+      },
+    },
+  },
+}
+```
+
+For each platform:
+- `enabled`: Controls whether the platform is available
+- For each model:
+  - `enabled`: Controls whether the specific model is selectable
+  - `label`: The display name shown in the UI
+
+Disabled models will appear grayed out in the UI but remain visible to show all available options.
+
 To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
 
 ## Getting Started
@@ -98,10 +162,18 @@ AZURE_SUB_KEY=your_azure_subscription_key
 # Google Gemini Pro API key (required for AI report generation)
 GEMINI_API_KEY=your_gemini_api_key
 
+# OpenAI API key (optional - required only if OpenAI models are enabled)
+OPENAI_API_KEY=your_openai_api_key
+
+# Anthropic API key (optional - required only if Anthropic models are enabled)
+ANTHROPIC_API_KEY=your_anthropic_api_key
+
 # Upstash Redis (required for rate limiting)
 UPSTASH_REDIS_REST_URL=your_upstash_redis_url
 UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
 ```
+
+Note: You only need to provide API keys for the platforms you plan to use. If a platform is enabled in the config but its API key is missing, those models will appear disabled in the UI.
 
 4. Start the development server:
 
@@ -130,6 +202,20 @@ bun dev
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Create an API key
 3. Copy the API key
+
+#### OpenAI API Key
+
+1. Visit [OpenAI Platform](https://platform.openai.com)
+2. Sign up or log in to your account
+3. Go to API Keys section
+4. Create a new API key
+
+#### Anthropic API Key
+
+1. Visit [Anthropic Console](https://console.anthropic.com)
+2. Sign up or log in to your account
+3. Go to API Keys section
+4. Create a new API key
 
 #### Upstash Redis
 
