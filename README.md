@@ -4,21 +4,22 @@
   <img src="demo.gif" alt="Open Deep Research Demo" width="800"/>
 </div>
 
-An open-source alternative to Gemini Deep Research, built to generate AI-powered reports from web search results with precision and efficiency.
+An open-source alternative to Gemini Deep Research, built to generate AI-powered reports from web search results with precision and efficiency. Supporting multiple AI platforms (Google, OpenAI, Anthropic) and models, it offers flexibility in choosing the right AI model for your research needs.
 
 This app functions in three key steps:
 
 1. **Search Results Retrieval**: Using the Bing Search API, the app fetches comprehensive search results for the specified search term.
 2. **Content Extraction**: Leveraging JinaAI, it retrieves and processes the contents of the selected search results, ensuring accurate and relevant information.
-3. **Report Generation**: With the curated search results and extracted content, the app generates a detailed report tailored to your custom prompts, providing insightful and synthesized output.
+3. **Report Generation**: With the curated search results and extracted content, the app generates a detailed report using your chosen AI model (Gemini, GPT-4, Sonnet, etc.), providing insightful and synthesized output tailored to your custom prompts.
 
-Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform. You can customize the app to your needs (change the model, prompt, update rate limits and number of results both fetched and selected etc.)
+Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform. You can customize the app to your needs (select your preferred AI model, customize prompts, update rate limits, and configure the number of results both fetched and selected).
 
 ## Features
 
 - 🔍 Web search with time filtering
 - 📄 Content extraction from web pages
-- 🤖 AI-powered report generation
+- 🤖 Multi-platform AI support (Google Gemini, OpenAI GPT, Anthropic Sonnet)
+- 🎯 Flexible model selection with granular configuration
 - 📊 Multiple export formats (PDF, Word, Text)
 - ⚡ Rate limiting for stability
 - 📱 Responsive design
@@ -61,7 +62,7 @@ search: {
 
 ### AI Platform Settings
 
-Configure which AI platforms and models are available:
+Configure which AI platforms and models are available. The app supports multiple AI platforms (Google, OpenAI, Anthropic) with various models for each platform. You can enable/disable platforms and individual models based on your needs:
 
 ```typescript
 platforms: {
@@ -121,7 +122,7 @@ For each platform:
   - `enabled`: Controls whether the specific model is selectable
   - `label`: The display name shown in the UI
 
-Disabled models will appear grayed out in the UI but remain visible to show all available options.
+Disabled models will appear grayed out in the UI but remain visible to show all available options. This allows users to see the full range of available models while clearly indicating which ones are currently accessible.
 
 To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
 
