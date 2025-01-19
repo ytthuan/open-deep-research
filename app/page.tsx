@@ -426,21 +426,6 @@ export default function Home() {
 
         <div className='mb-3'>
           <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='absolute left-4 top-4 hover:bg-gray-100 transition-colors'
-              onClick={() => setSidebarOpen(true)}
-            >
-              <div className='relative'>
-                <Brain className='h-5 w-5' />
-                <ChevronDown
-                  className={`h-3 w-3 absolute -right-1 -bottom-1 transition-transform ${
-                    sidebarOpen ? 'transform rotate-180' : ''
-                  }`}
-                />
-              </div>
-            </Button>
             <img
               src='/apple-icon.png'
               alt='Open Deep Research'
@@ -450,18 +435,29 @@ export default function Home() {
               Open Deep Research
             </span>
           </h1>
-          <p className='text-center text-gray-600 mb-6'>
-            <a
-              href='https://github.com/btahir/open-deep-research'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 hover:underline'
-            >
-              Open source alternative
-            </a>{' '}
-            to Gemini Deep Research. Generate reports with AI based on search
-            results.
-          </p>
+          <div className='text-center space-y-3 mb-8'>
+            <p className='text-gray-600'>
+              <a
+                href='https://github.com/btahir/open-deep-research'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 hover:underline'
+              >
+                Open source alternative
+              </a>{' '}
+              to Gemini Deep Research. Generate reports with AI based on search
+              results.
+            </p>
+            <div className='inline-block'>
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className='text-gray-600 hover:text-gray-900 inline-flex items-center gap-2 text-sm border rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors'
+              >
+                <Brain className='h-4 w-4' />
+                View Knowledge Base
+              </button>
+            </div>
+          </div>
           <form onSubmit={handleSearch} className='space-y-4'>
             <div className='flex flex-col sm:flex-row gap-2'>
               <div className='relative flex-1'>
