@@ -28,7 +28,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { type KnowledgeBaseReport } from '@/types'
 import type { Report } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -106,7 +105,7 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<string>(
     'google__gemini-flash'
   )
-  const { reports, addReport } = useKnowledgeBase()
+  const { addReport } = useKnowledgeBase()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const { toast } = useToast()
