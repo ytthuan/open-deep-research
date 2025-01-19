@@ -10,12 +10,23 @@ export interface Source {
   name: string
 }
 
-export interface Report {
+export type Report = {
   title: string
   summary: string
-  sources: Source[]
   sections: {
     title: string
     content: string
   }[]
+  sources: {
+    id: string
+    url: string
+    name: string
+  }[]
+}
+
+export type KnowledgeBaseReport = {
+  id: string
+  timestamp: number
+  query: string
+  report: Report
 }

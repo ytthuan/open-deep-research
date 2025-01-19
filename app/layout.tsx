@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Zen_Dots } from 'next/font/google'
+import { Toaster } from "@/components/ui/toaster"
+
 import './globals.css'
 
 const geistSans = Geist({
@@ -30,7 +32,8 @@ export default function RootLayout({
     <html lang='en'>
       <body className={`${geistSans.variable} ${zenDots.variable} antialiased`}>
         {children}
-      </body>
+        <Toaster />
+      </body>      
     </html>
   )
 }

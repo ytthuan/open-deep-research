@@ -5,7 +5,15 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, FileText, Download, Plus, X, ChevronDown } from 'lucide-react'
+import {
+  Search,
+  FileText,
+  Download,
+  Plus,
+  X,
+  ChevronDown,
+  Brain,
+} from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -20,7 +28,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { type Report } from '@/types'
+import { type KnowledgeBaseReport } from '@/types'
+import type { Report } from '@/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CONFIG } from '@/lib/config'
@@ -29,6 +38,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { useKnowledgeBase } from '@/lib/hooks/use-knowledge-base'
+import { useToast } from '@/hooks/use-toast'
+import { KnowledgeBaseSidebar } from '@/components/knowledge-base-sidebar'
 
 type SearchResult = {
   id: string
@@ -94,6 +106,10 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<string>(
     'google__gemini-flash'
   )
+  const { reports, addReport, deleteReport, searchReports } = useKnowledgeBase()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const { toast } = useToast()
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -374,8 +390,33 @@ export default function Home() {
     }
   }
 
+  const handleSaveToKnowledgeBase = () => {
+    if (!report) return
+    const success = addReport(report, reportPrompt)
+    if (success) {
+      toast({
+        title: 'Saved to Knowledge Base',
+        description: 'The report has been saved for future reference',
+      })
+    }
+  }
+
+  const handleLoadFromKnowledgeBase = (savedReport: KnowledgeBaseReport) => {
+    setReport(savedReport.report)
+    setReportPrompt(savedReport.query)
+    setActiveTab('report')
+    setSidebarOpen(false)
+  }
+
+  const filteredReports = reports
+
   return (
     <div className='min-h-screen bg-white p-4 sm:p-8'>
+      <KnowledgeBaseSidebar
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
+        onLoadReport={handleLoadFromKnowledgeBase}
+      />
       <main className='max-w-4xl mx-auto'>
         {error && (
           <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
@@ -383,7 +424,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className='mb-8'>
+        <div className='mb-3'>
           <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
             <img
               src='/apple-icon.png'
@@ -394,6 +435,17 @@ export default function Home() {
               Open Deep Research
             </span>
           </h1>
+          <div className='flex justify-center gap-2 mb-6'>
+            <Button
+              variant='outline'
+              size='sm'
+              className='gap-2'
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Brain className='h-4 w-4' />
+              View Knowledge Base
+            </Button>
+          </div>
           <p className='text-center text-gray-600 mb-6'>
             <a
               href='https://github.com/btahir/open-deep-research'
@@ -698,13 +750,22 @@ export default function Home() {
                       <h2 className='text-2xl font-bold text-gray-800 text-center sm:text-left'>
                         {report.title}
                       </h2>
-                      <div className='w-full sm:w-auto'>
+                      <div className='flex w-full sm:w-auto gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='gap-2'
+                          onClick={handleSaveToKnowledgeBase}
+                        >
+                          <Brain className='h-4 w-4' />
+                          Save to Brain
+                        </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant='outline'
                               size='sm'
-                              className='w-full sm:w-auto gap-2'
+                              className='gap-2'
                             >
                               <Download className='h-4 w-4' />
                               Download
