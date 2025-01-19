@@ -426,6 +426,21 @@ export default function Home() {
 
         <div className='mb-3'>
           <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='absolute left-4 top-4 hover:bg-gray-100 transition-colors'
+              onClick={() => setSidebarOpen(true)}
+            >
+              <div className='relative'>
+                <Brain className='h-5 w-5' />
+                <ChevronDown
+                  className={`h-3 w-3 absolute -right-1 -bottom-1 transition-transform ${
+                    sidebarOpen ? 'transform rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </Button>
             <img
               src='/apple-icon.png'
               alt='Open Deep Research'
@@ -435,17 +450,6 @@ export default function Home() {
               Open Deep Research
             </span>
           </h1>
-          <div className='flex justify-center gap-2 mb-6'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='gap-2'
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Brain className='h-4 w-4' />
-              View Knowledge Base
-            </Button>
-          </div>
           <p className='text-center text-gray-600 mb-6'>
             <a
               href='https://github.com/btahir/open-deep-research'
