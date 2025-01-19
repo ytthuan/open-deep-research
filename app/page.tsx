@@ -106,7 +106,7 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<string>(
     'google__gemini-flash'
   )
-  const { reports, addReport, deleteReport, searchReports } = useKnowledgeBase()
+  const { reports, addReport } = useKnowledgeBase()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const { toast } = useToast()
@@ -401,22 +401,9 @@ export default function Home() {
     }
   }
 
-  const handleLoadFromKnowledgeBase = (savedReport: KnowledgeBaseReport) => {
-    setReport(savedReport.report)
-    setReportPrompt(savedReport.query)
-    setActiveTab('report')
-    setSidebarOpen(false)
-  }
-
-  const filteredReports = reports
-
   return (
     <div className='min-h-screen bg-white p-4 sm:p-8'>
-      <KnowledgeBaseSidebar
-        open={sidebarOpen}
-        onOpenChange={setSidebarOpen}
-        onLoadReport={handleLoadFromKnowledgeBase}
-      />
+      <KnowledgeBaseSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
       <main className='max-w-4xl mx-auto'>
         {error && (
           <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>

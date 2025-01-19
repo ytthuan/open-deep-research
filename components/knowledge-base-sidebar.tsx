@@ -1,4 +1,4 @@
-import { Brain, Search, Trash2, X, AlertTriangle } from 'lucide-react'
+import { Brain, Search, Trash2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -18,16 +18,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 interface KnowledgeBaseSidebarProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onLoadReport: (savedReport: any) => void
 }
 
 export function KnowledgeBaseSidebar({
   open,
   onOpenChange,
-  onLoadReport,
 }: KnowledgeBaseSidebarProps) {
-  const { reports, deleteReport, searchReports, clearAllReports } =
-    useKnowledgeBase()
+  const { reports, searchReports, clearAllReports } = useKnowledgeBase()
   const [searchQuery, setSearchQuery] = useState('')
   const [showClearConfirm, setShowClearConfirm] = useState(false)
 

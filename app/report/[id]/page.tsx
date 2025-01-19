@@ -46,7 +46,7 @@ export default function ReportPage({
             <AlertTriangle className='h-4 w-4' />
             <AlertTitle>Report Not Found</AlertTitle>
             <AlertDescription>
-              The report you're looking for doesn't exist or has been deleted.
+              The report you&apos;re looking for doesn&apos;t exist or has been deleted.
             </AlertDescription>
           </Alert>
           <div className='mt-4 text-center'>
@@ -118,7 +118,7 @@ export default function ReportPage({
           <AlertDescription>
             This report was saved{' '}
             {formatDistanceToNow(report.timestamp, { addSuffix: true })}
-            in response to the query: "{report.query}"
+            in response to the query: &apos;{report.query}&apos;
           </AlertDescription>
         </Alert>
 
