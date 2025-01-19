@@ -11,6 +11,7 @@ This app functions in three key steps:
 1. **Search Results Retrieval**: Using the Bing Search API, the app fetches comprehensive search results for the specified search term.
 2. **Content Extraction**: Leveraging JinaAI, it retrieves and processes the contents of the selected search results, ensuring accurate and relevant information.
 3. **Report Generation**: With the curated search results and extracted content, the app generates a detailed report using your chosen AI model (Gemini, GPT-4, Sonnet, etc.), providing insightful and synthesized output tailored to your custom prompts.
+4. **Knowledge Base**: Save and access your generated reports in a personal knowledge base for future reference and easy retrieval.
 
 Open Deep Research combines powerful tools to streamline research and report creation in a user-friendly, open-source platform. You can customize the app to your needs (select your preferred AI model, customize prompts, update rate limits, and configure the number of results both fetched and selected).
 
@@ -21,12 +22,22 @@ Open Deep Research combines powerful tools to streamline research and report cre
 - 🤖 Multi-platform AI support (Google Gemini, OpenAI GPT, Anthropic Sonnet)
 - 🎯 Flexible model selection with granular configuration
 - 📊 Multiple export formats (PDF, Word, Text)
+- 🧠 Knowledge Base for saving and accessing past reports
 - ⚡ Rate limiting for stability
 - 📱 Responsive design
 
 ## Demo
 
 Try it out at: [Open Deep Research](https://opendeepresearch.vercel.app/)
+
+### Knowledge Base
+
+The Knowledge Base feature allows you to:
+
+- Save generated reports for future reference (reports are saved in the browser's local storage)
+- Access your research history
+- Quickly load and review past reports
+- Build a personal research library over time
 
 ## Configuration
 
@@ -59,6 +70,24 @@ search: {
   market: 'en-US',             // Search market/region
 }
 ```
+
+### Knowledge Base
+
+The Knowledge Base feature allows you to build a personal research library by:
+
+- Saving generated reports with their original search queries
+- Accessing and loading past reports instantly
+- Building a searchable archive of your research
+- Maintaining context across research sessions
+
+Reports saved to the Knowledge Base include:
+
+- The full report content with all sections
+- Original search query and prompt
+- Source URLs and references
+- Generation timestamp
+
+You can access your Knowledge Base through the dedicated button in the UI, which opens a sidebar containing all your saved reports.
 
 ### AI Platform Settings
 
@@ -117,6 +146,7 @@ platforms: {
 ```
 
 For each platform:
+
 - `enabled`: Controls whether the platform is available
 - For each model:
   - `enabled`: Controls whether the specific model is selectable
