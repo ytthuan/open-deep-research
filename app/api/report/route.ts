@@ -10,6 +10,8 @@ import { CONFIG } from '@/lib/config'
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
 
+export const maxDuration = 60
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 })
@@ -65,7 +67,7 @@ async function generateWithAnthropic(systemPrompt: string, model: string) {
         content: systemPrompt,
       },
     ],
-  })  
+  })
   return response.content[0].text || ''
 }
 
