@@ -43,11 +43,11 @@ export const CONFIG = {
         },
         'o1-mini': {
           enabled: false,
-          label: 'O1 Mini',
+          label: 'o1-mini',
         },
         o1: {
           enabled: false,
-          label: 'O1',
+          label: 'o1',
         },
       },
     },
