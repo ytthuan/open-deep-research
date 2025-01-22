@@ -744,7 +744,7 @@ export default function Home() {
                           onClick={handleSaveToKnowledgeBase}
                         >
                           <Brain className='h-4 w-4' />
-                          Save to Brain
+                          Save to Knowledge Base
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
