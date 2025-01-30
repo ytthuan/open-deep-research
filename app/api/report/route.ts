@@ -16,6 +16,11 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 })
 
+const deepseek = new OpenAI({
+  baseURL: 'https://api.deepseek.com',
+  apiKey: process.env.DEEPSEEK_API_KEY || '',
+})
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 })
@@ -29,6 +34,13 @@ type PlatformModel =
   | 'o1'
   | 'sonnet-3.5'
   | 'haiku-3.5'
+  | 'deepseek__chat'
+  | 'deepseek__reasoner'
+
+type DeepSeekMessage = {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
 
 async function generateWithGemini(systemPrompt: string, model: string) {
   if (model === 'gemini-flash-thinking') {
@@ -54,6 +66,43 @@ async function generateWithOpenAI(systemPrompt: string, model: string) {
     ],
   })
   return response.choices[0].message.content
+}
+
+async function generateWithDeepSeek(systemPrompt: string, model: string) {
+  try {
+    // Initial message to start the conversation
+    const messages: DeepSeekMessage[] = [
+      {
+        role: 'user',
+        content: systemPrompt,
+      },
+    ]
+
+    const response = await deepseek.chat.completions.create({
+      model,
+      messages: messages as any,
+      max_tokens: 4000,
+    })
+
+    // Get the initial response
+    const content = response.choices[0].message.content || ''
+
+    // For the reasoner model, we can get additional reasoning content
+    let reasoning = ''
+    const messageWithReasoning = response.choices[0].message as any
+    if (
+      model === 'deepseek-reasoner' &&
+      messageWithReasoning.reasoning_content
+    ) {
+      reasoning = messageWithReasoning.reasoning_content
+      console.log('DeepSeek reasoning:', reasoning)
+    }
+
+    return content
+  } catch (error) {
+    console.error('DeepSeek API error:', error)
+    throw error
+  }
 }
 
 async function generateWithAnthropic(systemPrompt: string, model: string) {
@@ -178,6 +227,7 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
     const systemPrompt = generateSystemPrompt(selectedResults, prompt)
 
     // console.log('Sending prompt to model:', systemPrompt)
+    console.log('Model:', model)
 
     try {
       let response: string | null = null
@@ -213,6 +263,15 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
           response = await generateWithAnthropic(
             systemPrompt,
             'claude-3-5-haiku-latest'
+          )
+          break
+        case 'chat':
+          response = await generateWithDeepSeek(systemPrompt, 'deepseek-chat')
+          break
+        case 'reasoner':
+          response = await generateWithDeepSeek(
+            systemPrompt,
+            'deepseek-reasoner'
           )
           break
         default:

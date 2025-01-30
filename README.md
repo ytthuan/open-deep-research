@@ -91,7 +91,7 @@ You can access your Knowledge Base through the dedicated button in the UI, which
 
 ### AI Platform Settings
 
-Configure which AI platforms and models are available. The app supports multiple AI platforms (Google, OpenAI, Anthropic) with various models for each platform. You can enable/disable platforms and individual models based on your needs:
+Configure which AI platforms and models are available. The app supports multiple AI platforms (Google, OpenAI, Anthropic, DeepSeek) with various models for each platform. You can enable/disable platforms and individual models based on your needs:
 
 ```typescript
 platforms: {
@@ -139,6 +139,19 @@ platforms: {
       'haiku-3.5': {
         enabled: false,
         label: 'Claude 3 Haiku',
+      },
+    },
+  },
+  deepseek: {
+    enabled: true,
+    models: {
+      'chat': {
+        enabled: true,
+        label: 'DeepSeek V3',
+      },
+      'reasoner': {
+        enabled: true,
+        label: 'DeepSeek R1',
       },
     },
   },
@@ -199,6 +212,9 @@ OPENAI_API_KEY=your_openai_api_key
 # Anthropic API key (optional - required only if Anthropic models are enabled)
 ANTHROPIC_API_KEY=your_anthropic_api_key
 
+# DeepSeek API key (optional - required only if DeepSeek models are enabled)
+DEEPSEEK_API_KEY=your_deepseek_api_key
+
 # Upstash Redis (required for rate limiting)
 UPSTASH_REDIS_REST_URL=your_upstash_redis_url
 UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
@@ -244,6 +260,13 @@ bun dev
 #### Anthropic API Key
 
 1. Visit [Anthropic Console](https://console.anthropic.com)
+2. Sign up or log in to your account
+3. Go to API Keys section
+4. Create a new API key
+
+#### DeepSeek API Key
+
+1. Visit [DeepSeek Platform](https://platform.deepseek.com)
 2. Sign up or log in to your account
 3. Go to API Keys section
 4. Create a new API key

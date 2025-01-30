@@ -64,5 +64,18 @@ export const CONFIG = {
         },
       },
     },
+    deepseek: {
+      enabled: true,
+      models: {
+        'chat': {
+          enabled: true,
+          label: 'Chat',
+        },
+        'reasoner': {
+          enabled: true,
+          label: 'Reasoner',
+        },
+      },
+    },
   },
 } as const
