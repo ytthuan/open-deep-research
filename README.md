@@ -2,6 +2,7 @@
 
 <div align="center">
   <img src="demo.gif" alt="Open Deep Research Demo" width="800"/>
+  <p><em>Note: Demo is sped up for brevity</em></p>
 </div>
 
 An open-source alternative to Gemini Deep Research, built to generate AI-powered reports from web search results with precision and efficiency. Supporting multiple AI platforms (Google, OpenAI, Anthropic) and models, it offers flexibility in choosing the right AI model for your research needs.
