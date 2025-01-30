@@ -1,11 +1,6 @@
 import React from 'react'
 import { ReportContent } from './report-content'
 
-interface PageProps {
-  params: { id: string }
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
-
-export default function ReportPage({ params }: PageProps) {
+export default function ReportPage({ params }: any) {
   return <ReportContent id={params.id} />
 }
