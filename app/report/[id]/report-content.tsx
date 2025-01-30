@@ -12,11 +12,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useKnowledgeBase } from '@/lib/hooks/use-knowledge-base'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
-interface ReportContentProps {
-  id: string
-}
-
-export function ReportContent({ id }: ReportContentProps) {
+export function ReportContent({ id }: any) {
   const router = useRouter()
   const { reports, deleteReport } = useKnowledgeBase()
   const [report, setReport] = useState<KnowledgeBaseReport | null>(null)
@@ -144,4 +140,4 @@ export function ReportContent({ id }: ReportContentProps) {
       </div>
     </div>
   )
-} 
+}
