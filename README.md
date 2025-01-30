@@ -169,6 +169,31 @@ Disabled models will appear grayed out in the UI but remain visible to show all 
 
 To modify these settings, update the values in `lib/config.ts`. The changes will take effect after restarting the development server.
 
+### Important Note for Reasoning Models
+
+When using advanced reasoning models like OpenAI's o1 or DeepSeek Reasoner, you may need to increase the serverless function duration limit as these models typically take longer to generate comprehensive reports. The default duration might not be sufficient.
+
+For Vercel deployments, you can increase the duration limit in your `vercel.json`:
+
+```json
+{
+  "functions": {
+    "app/api/report/route.ts": {
+      "maxDuration": 120
+    }
+  }
+}
+```
+
+Or modify the duration in your route file:
+
+```typescript
+// In app/api/report/route.ts
+export const maxDuration = 120 // Set to 120 seconds or higher
+```
+
+Note: The maximum duration limit may vary based on your hosting platform and subscription tier.
+
 ## Getting Started
 
 ### Prerequisites
