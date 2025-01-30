@@ -67,12 +67,12 @@ export const CONFIG = {
     deepseek: {
       enabled: true,
       models: {
-        'chat': {
-          enabled: true,
+        chat: {
+          enabled: false,
           label: 'Chat',
         },
-        'reasoner': {
-          enabled: true,
+        reasoner: {
+          enabled: false,
           label: 'Reasoner',
         },
       },
