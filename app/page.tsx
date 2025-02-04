@@ -127,13 +127,10 @@ export default function Home() {
       })
 
       if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(
-            'Search rate limit exceeded. Please wait a moment before trying again.'
-          )
-        }
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Search failed. Please try again.')
+        setError(errorData.error || 'Search failed. Please try again.')
+        setResults([])
+        return
       }
 
       const data = await response.json()
