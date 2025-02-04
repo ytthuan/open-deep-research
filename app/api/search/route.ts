@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       const { success } = await searchRatelimit.limit(query)
       if (!success) {
         return NextResponse.json(
-          { error: 'Too many requests' },
+          { error: 'Too many requests. Please wait a moment before trying again.' },
           { status: 429 }
         )
       }
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const subscriptionKey = process.env.AZURE_SUB_KEY
     if (!subscriptionKey) {
       return NextResponse.json(
-        { error: 'Search API key not configured' },
+        { error: 'Search API is not properly configured. Please check your environment variables.' },
         { status: 500 }
       )
     }
@@ -80,7 +80,11 @@ export async function POST(request: Request) {
           { status: 403 }
         )
       }
-      throw new Error(`Search API returned ${response.status}`)
+      const errorData = await response.json().catch(() => null);
+      return NextResponse.json(
+        { error: errorData?.message || `Search API returned error ${response.status}` },
+        { status: response.status }
+      )
     }
 
     const data = await response.json()
@@ -88,7 +92,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Search API error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch search results' },
+      { 
+        error: error instanceof Error 
+          ? error.message 
+          : 'An unexpected error occurred while fetching search results'
+      },
       { status: 500 }
     )
   }

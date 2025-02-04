@@ -128,12 +128,21 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        setError(errorData.error || 'Search failed. Please try again.')
+        const errorMessage = errorData.error || 'Search failed. Please try again.'
+        setError(errorMessage)
+        toast({
+          title: "Search Error",
+          description: errorMessage,
+          variant: "destructive",
+        })
         setResults([])
         return
       }
 
       const data = await response.json()
+      
+      // Clear any previous errors if the search was successful
+      setError(null)
 
       // Create a Set to track unique IDs
       const seenIds = new Set<string>()
@@ -174,7 +183,13 @@ export default function Home() {
       setResults([...uniqueResults, ...newResults])
     } catch (error) {
       console.error('Search failed:', error)
-      setError(error instanceof Error ? error.message : 'Search failed')
+      const errorMessage = error instanceof Error ? error.message : 'Search failed'
+      setError(errorMessage)
+      toast({
+        title: "Search Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -211,7 +226,13 @@ export default function Home() {
       }
       setNewUrl('')
     } catch {
-      setError('Please enter a valid URL')
+      const errorMessage = 'Please enter a valid URL'
+      setError(errorMessage)
+      toast({
+        title: "Invalid URL",
+        description: errorMessage,
+        variant: "destructive",
+      })
     }
   }
 
@@ -350,9 +371,13 @@ export default function Home() {
       setActiveTab('report')
     } catch (error) {
       console.error('Report generation failed:', error)
-      setError(
-        error instanceof Error ? error.message : 'Report generation failed'
-      )
+      const errorMessage = error instanceof Error ? error.message : 'Report generation failed'
+      setError(errorMessage)
+      toast({
+        title: "Report Generation Failed",
+        description: errorMessage,
+        variant: "destructive",
+      })
     } finally {
       setGeneratingReport(false)
     }
@@ -490,6 +515,12 @@ export default function Home() {
           </form>
         </div>
 
+        {error && (
+          <div className='p-4 mb-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
+            {error}
+          </div>
+        )}
+
         {results.length > 0 && (
           <Tabs
             value={activeTab}
@@ -579,11 +610,6 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value='search' className='space-y-4'>
-              {error && (
-                <div className='p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
-                  {error}
-                </div>
-              )}
               {results
                 .filter((r) => r.isCustomUrl)
                 .map((result) => (
