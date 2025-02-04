@@ -405,12 +405,6 @@ export default function Home() {
     <div className='min-h-screen bg-white p-4 sm:p-8'>
       <KnowledgeBaseSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
       <main className='max-w-4xl mx-auto'>
-        {error && (
-          <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
-            {error}
-          </div>
-        )}
-
         <div className='mb-3'>
           <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
             <img
@@ -588,6 +582,11 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value='search' className='space-y-4'>
+              {error && (
+                <div className='p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-center'>
+                  {error}
+                </div>
+              )}
               {results
                 .filter((r) => r.isCustomUrl)
                 .map((result) => (
