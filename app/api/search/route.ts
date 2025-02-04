@@ -74,6 +74,12 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok) {
+      if (response.status === 403) {
+        return NextResponse.json(
+          { error: 'Monthly search quota exceeded. Please try again next month or contact support for increased limits.' },
+          { status: 403 }
+        )
+      }
       throw new Error(`Search API returned ${response.status}`)
     }
 
