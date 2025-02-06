@@ -1,7 +1,7 @@
 export const CONFIG = {
   // Rate limits (requests per minute)
   rateLimits: {
-    enabled: true, // Flag to enable/disable rate limiting
+    enabled: false, // Flag to enable/disable rate limiting
     search: 2,
     contentFetch: 20,
     reportGeneration: 2,
@@ -10,7 +10,7 @@ export const CONFIG = {
   // Search settings
   search: {
     resultsPerPage: 10,
-    maxSelectableResults: 3,
+    maxSelectableResults: 10,
     safeSearch: 'Moderate' as const,
     market: 'en-US',
   },
@@ -35,7 +35,7 @@ export const CONFIG = {
       },
     },
     openai: {
-      enabled: true,
+      enabled: false,
       models: {
         'gpt-4o': {
           enabled: false,
@@ -52,7 +52,7 @@ export const CONFIG = {
       },
     },
     anthropic: {
-      enabled: true,
+      enabled: false,
       models: {
         'sonnet-3.5': {
           enabled: false,
@@ -65,7 +65,7 @@ export const CONFIG = {
       },
     },
     deepseek: {
-      enabled: true,
+      enabled: false,
       models: {
         chat: {
           enabled: false,

@@ -44,7 +44,7 @@ export const geminiFlashModel = genAI.getGenerativeModel({
 })
 
 export const geminiFlashThinkingModel = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash-thinking-exp-1219',
+  model: 'gemini-2.0-flash-thinking-exp-01-21',
   safetySettings,
   generationConfig: generationPlainTextConfig,
 })

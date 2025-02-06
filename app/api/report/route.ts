@@ -10,7 +10,7 @@ import { CONFIG } from '@/lib/config'
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -221,7 +221,7 @@ Use markdown formatting in the content to improve readability:
 - Use > for quotations
 - Use --- for horizontal rules where appropriate
 
-Important: Do not use phrases like "Source 1" or "According to Source 2". Instead, integrate the information naturally into the narrative or reference sources by their titles when necessary.`
+Important: Do not use phrases like "Source 1" or "According to Source 2". Instead, integrate the information naturally into the narrative or reference sources by their titles when necessary. Use Vietnamese for your final report output`
     }
 
     const systemPrompt = generateSystemPrompt(selectedResults, prompt)
@@ -296,7 +296,7 @@ Important: Do not use phrases like "Source 1" or "According to Source 2". Instea
         const reportData = JSON.parse(jsonMatch)
         // Add sources to the report data
         reportData.sources = sources
-        console.log('Parsed report data:', reportData)
+        // console.log('Parsed report data:', reportData)
         return NextResponse.json(reportData)
       } catch (parseError) {
         console.error('JSON parsing error:', parseError)

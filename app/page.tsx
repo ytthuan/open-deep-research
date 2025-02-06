@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import Image from 'next/image'
 import {
   Search,
   FileText,
@@ -40,6 +41,7 @@ import {
 import { useKnowledgeBase } from '@/lib/hooks/use-knowledge-base'
 import { useToast } from '@/hooks/use-toast'
 import { KnowledgeBaseSidebar } from '@/components/knowledge-base-sidebar'
+// import { log } from 'console'
 
 type SearchResult = {
   id: string
@@ -103,7 +105,7 @@ export default function Home() {
   const [newUrl, setNewUrl] = useState('')
   const [isSourcesOpen, setIsSourcesOpen] = useState(false)
   const [selectedModel, setSelectedModel] = useState<string>(
-    'google__gemini-flash'
+    'gemini-flash-thinking'
   )
   const { addReport } = useKnowledgeBase()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -113,7 +115,7 @@ export default function Home() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!query.trim()) return
-
+  
     setLoading(true)
     setError(null)
     setReportPrompt('')
@@ -125,7 +127,6 @@ export default function Home() {
         },
         body: JSON.stringify({ query, timeFilter }),
       })
-
       if (!response.ok) {
         const errorData = await response.json()
         const errorMessage = errorData.error || 'Search failed. Please try again.'
@@ -138,16 +139,16 @@ export default function Home() {
         setResults([])
         return
       }
-
+  
       const data = await response.json()
-      
+      // console.log('Search API response:', data);
       // Clear any previous errors if the search was successful
       setError(null)
-
+  
       // Create a Set to track unique IDs
       const seenIds = new Set<string>()
       const uniqueResults: SearchResult[] = []
-
+  
       // First add selected items
       results
         .filter((r) => selectedResults.includes(r.id))
@@ -157,7 +158,7 @@ export default function Home() {
             seenIds.add(item.id)
           }
         })
-
+  
       // Then add custom URLs
       results
         .filter((r) => r.isCustomUrl)
@@ -167,10 +168,10 @@ export default function Home() {
             seenIds.add(item.id)
           }
         })
-
-      // Finally add new search results
+  
+      // Finally add new search results from the API response (now a plain array)
       const timestamp = Date.now()
-      const newResults = (data.webPages?.value || [])
+      const newResults = (data || [])
         .map((result: SearchResult) => ({
           ...result,
           id: `search-${timestamp}-${result.id || result.url}`,
@@ -179,7 +180,7 @@ export default function Home() {
           (newResult: SearchResult) =>
             !uniqueResults.some((existing) => existing.url === newResult.url)
         )
-
+  
       setResults([...uniqueResults, ...newResults])
     } catch (error) {
       console.error('Search failed:', error)
@@ -429,9 +430,11 @@ export default function Home() {
       <main className='max-w-4xl mx-auto'>
         <div className='mb-3'>
           <h1 className='mb-2 text-center text-gray-800 flex items-center justify-center gap-2'>
-            <img
-              src='/apple-icon.png'
+            <Image
+              src='/icon.png'
               alt='Open Deep Research'
+              width={48}
+              height={48}
               className='w-6 h-6 sm:w-8 sm:h-8 rounded-full'
             />
             <span className='text-xl sm:text-3xl font-bold font-heading'>
@@ -441,7 +444,7 @@ export default function Home() {
           <div className='text-center space-y-3 mb-8'>
             <p className='text-gray-600'>
               <a
-                href='https://github.com/btahir/open-deep-research'
+                href='https://github.com/ytthuan/open-deep-research'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-blue-600 hover:underline'
