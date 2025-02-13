@@ -328,8 +328,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 - Inspired by Google's Gemini Deep Research feature
 - Built with amazing open source tools and APIs
 
-## Follow Me
 
-If you're interested in following all the random projects I'm working on, you can find me on Twitter:
-
-[![Twitter Follow](https://img.shields.io/twitter/follow/deepwhitman?style=social)](https://x.com/deepwhitman)
