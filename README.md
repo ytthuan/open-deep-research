@@ -325,6 +325,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Acknowledgments
 
+Forked and customized from: btahir/open-deep-research
+
 - Inspired by Google's Gemini Deep Research feature
 - Built with amazing open source tools and APIs
 
