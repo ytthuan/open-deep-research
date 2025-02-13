@@ -43,16 +43,42 @@ type DeepSeekMessage = {
 }
 
 async function generateWithGemini(systemPrompt: string, model: string) {
-  if (model === 'gemini-flash-thinking') {
-    const result = await geminiFlashThinkingModel.generateContent(systemPrompt)
-    return result.response.text()
-  } else if (model === 'gemini-exp') {
-    const result = await geminiModel.generateContent(systemPrompt)
-    return result.response.text()
-  } else {
-    const result = await geminiFlashModel.generateContent(systemPrompt)
-    return result.response.text()
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 60000; // 1 minute in milliseconds
+  let retries = 0;
+
+  while (retries < MAX_RETRIES) {
+    try {
+      if (model === 'gemini-flash-thinking') {
+        const result = await geminiFlashThinkingModel.generateContent(systemPrompt)
+        return result.response.text()
+      } else if (model === 'gemini-exp') {
+        const result = await geminiModel.generateContent(systemPrompt) 
+        return result.response.text()
+      } else {
+        const result = await geminiFlashModel.generateContent(systemPrompt)
+        return result.response.text()
+      }
+    } catch (error) {
+      console.error(`Attempt ${retries + 1} failed:`, (error as Error).message);
+
+      // Check for specific error conditions
+      
+        
+        retries++;
+        if (retries < MAX_RETRIES) {
+          console.log(`Rate limited or service overloaded. Waiting ${RETRY_DELAY/1000} seconds before retry ${retries}/${MAX_RETRIES}...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        }
+      
+      
+      // If we've exhausted retries or it's a different error, throw it
+      throw new Error(`Gemini API error after ${retries} retries`);
+    }
   }
+
+  throw new Error('Max retries exceeded for Gemini API call');
 }
 
 async function generateWithOpenAI(systemPrompt: string, model: string) {

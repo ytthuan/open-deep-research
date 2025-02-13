@@ -451,7 +451,7 @@ export default function Home() {
               >
                 Open source alternative
               </a>{' '}
-              to Gemini Deep Research. Generate reports with AI based on search
+              to Gemini, Open AI Deep Research. Generate reports with AI based on search
               results.
             </p>
             <div className='inline-block'>
